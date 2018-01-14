@@ -12,6 +12,8 @@
 
 # Package Files #
 *.jar
+!jwordsplitter-3.4.jar
+!slf4j-api-1.7.25.jar
 *.war
 *.ear
 *.zip
