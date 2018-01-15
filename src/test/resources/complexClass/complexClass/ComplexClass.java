@@ -1,4 +1,5 @@
 package complexClass;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +40,7 @@ public class ComplexClass {
         ComplexClass.logger.error("Over");
         logger.error("Over");
     }
-
+    
     /*
     public Set<String> methodContainingComplexStreamExpression() {
         final List<Integer> listToStreamThrough = Arrays.asList(5, 8, 16, 21, 64, 64, 128, 111, 113, 7, 61, 2048, 5, -2);
@@ -68,4 +69,5 @@ public class ComplexClass {
         public CoreException(Exception pException) {
         }
     }
+
 }

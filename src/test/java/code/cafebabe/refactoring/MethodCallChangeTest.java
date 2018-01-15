@@ -95,16 +95,15 @@ public class MethodCallChangeTest {
         // Given
         final Change change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
         final String testFolderMain = "complexClass/";
-        final String testFileName = "ComplexClassAfterRemoval.java";
+        final String testFileName = "ComplexClass.java";
+        final String targetFileName = "ComplexClassAfterRemoval.java";
         final File testBase = new File(TEST_RESOURCES_BASE, testFolderMain);
-        final File target = new File(TEST_RESOURCES_TARGETS, testFolderMain + testFileName);
+        final File target = new File(TEST_RESOURCES_TARGETS, testFolderMain + targetFileName);
 
         final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
                 .build();
 
         // When
-        assertEquals(1, codeBase.size());
-
         final Iterator<File> codeBaseIterator = codeBase.iterator();
         while (codeBaseIterator.hasNext()) {
             final File next = codeBaseIterator.next();
@@ -121,13 +120,15 @@ public class MethodCallChangeTest {
                 // Apply change and print
                 final CompilationUnit changed = change.apply(cu.b, mySolver);
 
-                boolean writeToFile = false;
+                boolean writeToFile = true;
                 if (writeToFile) {
                     writeToFile(cu, changed);
                 }
 
                 // Then
-                assertEquals(CompilationUnitFactory.createPreservingCompilationUnit(target).b.toString(), changed.toString());
+                assertEquals(LexicalPreservingPrinter
+                        .print(CompilationUnitFactory.createPreservingCompilationUnit(target).b),
+                        LexicalPreservingPrinter.print(changed));
 
             } catch (IOException e) {
                 fail("Exception has been thrown! " + e.getClass().getName());
