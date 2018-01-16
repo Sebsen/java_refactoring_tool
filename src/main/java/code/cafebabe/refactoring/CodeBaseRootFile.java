@@ -46,6 +46,14 @@ public class CodeBaseRootFile {
     }
 
     /**
+	 * @return
+	 * @see java.io.File#exists()
+	 */
+	public boolean exists() {
+		return referencedFile.exists();
+	}
+
+	/**
      * @param pathname
      * @return
      * @see java.io.File#compareTo(java.io.File)

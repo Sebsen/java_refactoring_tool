@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.concurrent.BlockingQueue;
@@ -303,12 +305,12 @@ public class CodeBase implements BlockingQueue<File> {
         return codeBaseRoots;
     }
 
-    public static class CodeBaseBuilder {
+    public static final class CodeBaseBuilder {
 
         private boolean recursive = true;
         private Set<CodeBaseRootFile> codeBaseRoots = new LinkedHashSet<>();
 
-        private CodeBaseBuilder(final Set<CodeBaseRootFile> pCodeBaseRoots) {
+        private CodeBaseBuilder(final Collection<CodeBaseRootFile> pCodeBaseRoots) {
             codeBaseRoots.addAll(pCodeBaseRoots);
         }
 
@@ -320,8 +322,14 @@ public class CodeBase implements BlockingQueue<File> {
             return fromRoots(new LinkedHashSet<>(asList(pCodeBaseRoots)));
         }
 
-        public static CodeBaseBuilder fromRoots(final Set<File> pCodeBaseRoots) {
-            return new CodeBaseBuilder(pCodeBaseRoots.stream().map(CodeBaseRootFile::fromFile).collect(Collectors.toSet()));
+		public static CodeBaseBuilder fromRoots(final Set<File> pCodeBaseRoots) {
+			final Map<Boolean, List<CodeBaseRootFile>> collect = pCodeBaseRoots.stream().map(CodeBaseRootFile::fromFile)
+					.collect(Collectors.partitioningBy(CodeBaseRootFile::exists));
+			if (!collect.get(false).isEmpty()) {
+				final CodeBaseRootFile firstMissingRoot = collect.get(false).get(0);
+				throwFileNotFoundException(firstMissingRoot.getReferencedFile());
+			}
+			return new CodeBaseBuilder(collect.get(true));
         }
 
         public CodeBaseBuilder addRoot(final String pRootToAdd) {
@@ -329,21 +337,27 @@ public class CodeBase implements BlockingQueue<File> {
         }
 
         public CodeBaseBuilder addRoot(final File pRootToAdd) {
+        	assertFileExists(pRootToAdd);
             codeBaseRoots.add(CodeBaseRootFile.fromFile(pRootToAdd));
             return this;
         }
 
-        public CodeBaseBuilder recursive(final boolean pRecursive) {
+        private static void assertFileExists(final File pFileToCheck) {
+			if (!pFileToCheck.exists()) {
+				throwFileNotFoundException(pFileToCheck);
+			}
+		}
+        
+        private static void throwFileNotFoundException(final File pMissingFile) {
+        	throw new FileNotFoundExceptionException(pMissingFile.getAbsolutePath() + " not found!");
+        }
+
+		public CodeBaseBuilder recursive(final boolean pRecursive) {
             recursive = pRecursive;
             return this;
         }
 
         public CodeBase build() {
-            codeBaseRoots.forEach(f -> {
-                if (!f.getReferencedFile().exists()) {
-                    throw new FileNotFoundExceptionException(f.getReferencedFile().getAbsolutePath() + " not found!");
-                }
-            });
             return new CodeBase(codeBaseRoots, recursive);
         }
 
@@ -353,18 +367,17 @@ public class CodeBase implements BlockingQueue<File> {
         }
 
         public CodeBaseBuilder addJarRoot(final File pJar) {
+        	assertFileExists(pJar);
             codeBaseRoots.add(CodeBaseRootFile.fromJar(pJar));
             return this;
         }
 
-        public class FileNotFoundExceptionException extends IllegalArgumentException {
+        public static final class FileNotFoundExceptionException extends IllegalArgumentException {
+        	private static final long serialVersionUID = 1L;
 
-            public FileNotFoundExceptionException(String string) {
+        	public FileNotFoundExceptionException(String string) {
                 super(string);
             }
-
-            private static final long serialVersionUID = 1L;
-
         }
 
     }
