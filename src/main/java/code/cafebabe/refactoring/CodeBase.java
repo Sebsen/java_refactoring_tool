@@ -30,9 +30,9 @@ public class CodeBase implements BlockingQueue<File> {
     private final BlockingQueue<File> matchingFiles;
     private final Set<CodeBaseRootFile> codeBaseRoots;
 
-    private CodeBase(final Set<CodeBaseRootFile> pCodeBaseRoot, final boolean pRecursive) {
+    private CodeBase(final Set<CodeBaseRootFile> pCodeBaseRoots, final boolean pRecursive) {
         matchingFiles = new LinkedBlockingQueue<>();
-        codeBaseRoots = Collections.unmodifiableSet(new LinkedHashSet<>(pCodeBaseRoot));
+        codeBaseRoots = Collections.unmodifiableSet(new LinkedHashSet<>(pCodeBaseRoots));
         codeBaseRoots.stream().filter(CodeBaseRootFile::isSourceFile)
                 .flatMap(f -> FileUtil.getMatchingFiles(f.getReferencedFile(), asList(Pattern.compile(".*\\.java")), pRecursive).stream()).forEach(matchingFiles::add);
     }
