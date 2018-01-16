@@ -368,11 +368,20 @@ public class CodeBase implements BlockingQueue<File> {
 
         public CodeBaseBuilder addJarRoot(final File pJar) {
         	assertFileExists(pJar);
-            codeBaseRoots.add(CodeBaseRootFile.fromJar(pJar));
+            codeBaseRoots.addAll(expandJarRootDirectory(pJar));
             return this;
         }
 
-        public static final class FileNotFoundExceptionException extends IllegalArgumentException {
+        private Collection<? extends CodeBaseRootFile> expandJarRootDirectory(final File pJarToExpand) {
+        	if (!pJarToExpand.isDirectory()) {
+        		return asList(CodeBaseRootFile.fromJar(pJarToExpand));
+        	}
+
+			return FileUtil.getMatchingFiles(pJarToExpand, asList(Pattern.compile(".*\\.jar")), true).stream()
+					.map(CodeBaseRootFile::fromJar).collect(Collectors.toSet());
+		}
+
+		public static final class FileNotFoundExceptionException extends IllegalArgumentException {
         	private static final long serialVersionUID = 1L;
 
         	public FileNotFoundExceptionException(String string) {
