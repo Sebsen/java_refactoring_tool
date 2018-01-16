@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.CodeBase.CodeBaseBuilder;
-import code.cafebabe.refactoring.CodeBase.CodeBaseBuilder.FileNotFoundExceptionException;
+import code.cafebabe.refactoring.CodeBase.CodeBaseBuilder.FileNotFoundException;
 import code.cafebabe.refactoring.CodeBaseRootFile;
 
 @RunWith(JUnitPlatform.class)
@@ -206,7 +206,7 @@ public class CodeBaseBuilderTest {
     	
     	// Then
         // Exception because tried to add nonexistent jar root!
-        assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.addJarRoot(nonexistentJarRoot));
+        assertThrows(FileNotFoundException.class, () -> codeBaseBuilder.addJarRoot(nonexistentJarRoot));
     }
 
     @Test
@@ -223,7 +223,7 @@ public class CodeBaseBuilderTest {
     	
     	// Then
         // Exception because tried to add nonexistent jar root!
-        assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.addJarRoot(nonexistentJarRoot));
+        assertThrows(FileNotFoundException.class, () -> codeBaseBuilder.addJarRoot(nonexistentJarRoot));
     }
 
     @Test

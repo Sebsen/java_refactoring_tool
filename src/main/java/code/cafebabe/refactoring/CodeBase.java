@@ -359,7 +359,7 @@ public class CodeBase implements BlockingQueue<File> {
 		}
         
         private static void throwFileNotFoundException(final File pMissingFile) {
-        	throw new FileNotFoundExceptionException(pMissingFile.getAbsolutePath() + " not found!");
+        	throw new FileNotFoundException(pMissingFile.getAbsolutePath() + " not found!");
         }
 
 		public CodeBaseBuilder recursive(final boolean pRecursive) {
@@ -391,10 +391,10 @@ public class CodeBase implements BlockingQueue<File> {
 					.map(CodeBaseRootFile::fromJar).collect(Collectors.toSet());
 		}
 
-		public static final class FileNotFoundExceptionException extends IllegalArgumentException {
+		public static final class FileNotFoundException extends IllegalArgumentException {
         	private static final long serialVersionUID = 1L;
 
-        	public FileNotFoundExceptionException(String string) {
+        	public FileNotFoundException(String string) {
                 super(string);
             }
         }
