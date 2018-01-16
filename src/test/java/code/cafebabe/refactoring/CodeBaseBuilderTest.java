@@ -216,4 +216,16 @@ public class CodeBaseBuilderTest {
         // Jar does not exist!
         assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.build());
     }
+
+    @Test
+    public void whenJarRootFolderIsAddedToCodebaseThenAllContainedJarsAreAddedToCodeBase() {
+    	// Given
+    	final CodeBase codeBase = CodeBase.CodeBaseBuilder
+    			.fromRoots("src/test/resources/fieldAccessMessageLoggerTestFiles")
+    			.addJarRoot("lib").build();
+    	
+    	// When & Then
+    	assertEquals(2, codeBase.getCodeBaseRoots().stream().filter(CodeBaseRootFile::isJar).collect(Collectors.toSet())
+                .size());
+    }
 }
