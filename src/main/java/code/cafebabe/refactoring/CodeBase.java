@@ -24,19 +24,29 @@ import code.cafebabe.refactoring.util.FileUtil;
 
 public class CodeBase implements BlockingQueue<File> {
 
-    @Override
-    public String toString() {
-        return matchingFiles.toString();
-    }
+	private final BlockingQueue<File> matchingFiles;
+	private final Set<CodeBaseRootFile> codeBaseRoots;
 
-    private final BlockingQueue<File> matchingFiles;
-    private final Set<CodeBaseRootFile> codeBaseRoots;
+	/**
+	 * Pattern which files have to satisfy for being added as jar file roots to a codebase
+	 */
+	private static final List<Pattern> JAR_FILE_PATTERN = asList(Pattern.compile(".*\\.jar"));
+
+	/**
+	 * Pattern which files have to satisfy for being added as source files to a codebase
+	 */
+	private static final List<Pattern> SOURCE_FILE_PATTERN = asList(Pattern.compile(".*\\.java"));
 
     private CodeBase(final Set<CodeBaseRootFile> pCodeBaseRoots, final boolean pRecursive) {
         matchingFiles = new LinkedBlockingQueue<>();
         codeBaseRoots = Collections.unmodifiableSet(new LinkedHashSet<>(pCodeBaseRoots));
         codeBaseRoots.stream().filter(CodeBaseRootFile::isSourceFile)
-                .flatMap(f -> FileUtil.getMatchingFiles(f.getReferencedFile(), asList(Pattern.compile(".*\\.java")), pRecursive).stream()).forEach(matchingFiles::add);
+                .flatMap(f -> FileUtil.getMatchingFiles(f.getReferencedFile(), SOURCE_FILE_PATTERN, pRecursive).stream()).forEach(matchingFiles::add);
+    }
+
+    @Override
+    public String toString() {
+    	return matchingFiles.toString();
     }
 
     /**
@@ -377,7 +387,7 @@ public class CodeBase implements BlockingQueue<File> {
         		return asList(CodeBaseRootFile.fromJar(pJarToExpand));
         	}
 
-			return FileUtil.getMatchingFiles(pJarToExpand, asList(Pattern.compile(".*\\.jar")), true).stream()
+			return FileUtil.getMatchingFiles(pJarToExpand, CodeBase.JAR_FILE_PATTERN, true).stream()
 					.map(CodeBaseRootFile::fromJar).collect(Collectors.toSet());
 		}
 
