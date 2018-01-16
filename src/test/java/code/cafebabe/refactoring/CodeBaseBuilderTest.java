@@ -15,6 +15,7 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
 import code.cafebabe.refactoring.CodeBase;
+import code.cafebabe.refactoring.CodeBase.CodeBaseBuilder;
 import code.cafebabe.refactoring.CodeBase.CodeBaseBuilder.FileNotFoundExceptionException;
 import code.cafebabe.refactoring.CodeBaseRootFile;
 
@@ -195,26 +196,34 @@ public class CodeBaseBuilderTest {
     @Test
     public void whenNonExistingJarFileIsAddedToCodebaseThenErrorIsThrown() {
         // Given
-        final CodeBase.CodeBaseBuilder codeBaseBuilder = CodeBase.CodeBaseBuilder
-                .fromRoots("src/test/resources/fieldAccessMessageLoggerTestFiles")
-                .addJarRoot("lib/myNonExistingJar.jar");
+    	// Nonexistent jar (root for codebase)
+    	final String nonexistentJarRoot = "lib/myNonExistingJar.jar";
 
-        // When & Then
-        // Jar does not exist!
-        assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.build());
+        // When
+    	// Adding existing roots works
+    	final CodeBaseBuilder codeBaseBuilder = CodeBase.CodeBaseBuilder
+        .fromRoots("src/test/resources/fieldAccessMessageLoggerTestFiles");
+    	
+    	// Then
+        // Exception because tried to add nonexistent jar root!
+        assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.addJarRoot(nonexistentJarRoot));
     }
 
     @Test
     public void whenExistingAndNonExistingJarFileIsAddedToCodebaseThenErrorIsThrown() {
         // Given
-        final CodeBase.CodeBaseBuilder codeBaseBuilder = CodeBase.CodeBaseBuilder
-                .fromRoots("src/test/resources/fieldAccessMessageLoggerTestFiles")
-                .addJarRoot("lib/slf4j-api-1.7.25.jar")
-                .addJarRoot("lib/myNonExistingJar.jar");
+    	// Nonexistent jar (root for codebase)
+    	final String nonexistentJarRoot = "lib/myNonExistingJar.jar";
 
-        // When & Then
-        // Jar does not exist!
-        assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.build());
+        // When
+    	// Adding existing roots works
+    	final CodeBaseBuilder codeBaseBuilder = CodeBase.CodeBaseBuilder
+        .fromRoots("src/test/resources/fieldAccessMessageLoggerTestFiles")
+        .addJarRoot("lib/slf4j-api-1.7.25.jar");
+    	
+    	// Then
+        // Exception because tried to add nonexistent jar root!
+        assertThrows(FileNotFoundExceptionException.class, () -> codeBaseBuilder.addJarRoot(nonexistentJarRoot));
     }
 
     @Test
