@@ -40,6 +40,7 @@ import code.cafebabe.refactoring.MethodCallChange;
 import code.cafebabe.refactoring.MethodCallChange.ActionType;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import code.cafebabe.refactoring.factory.TypeSolverFactory;
+import code.cafebabe.refactoring.util.CompilationUnitWriter;
 import complexClass.custom.Logger;
 
 @RunWith(JUnitPlatform.class)
@@ -122,7 +123,7 @@ public class MethodCallChangeTest {
 
                 boolean writeToFile = true;
                 if (writeToFile) {
-                    writeToFile(cu, changed);
+                    CompilationUnitWriter.writeToFile(changed, new File(cu.a.getParent(), "out.java"));
                 }
 
                 // Then
@@ -137,14 +138,6 @@ public class MethodCallChangeTest {
 
         // Then
 
-    }
-
-    private void writeToFile(Pair<File, CompilationUnit> cu, CompilationUnit changed) throws IOException {
-        FileWriter fout = new FileWriter(new File(cu.a.getParent(), "out.java"));
-        BufferedWriter oos = new BufferedWriter(fout);
-        oos.write(LexicalPreservingPrinter.print(changed));
-//        oos.write(changed.toString());
-        oos.close();
     }
 
     @Test
@@ -181,7 +174,7 @@ public class MethodCallChangeTest {
 
                 boolean writeToFile = true;
                 if (writeToFile) {
-                    writeToFile(cu, changed);
+                    CompilationUnitWriter.writeToFile(changed, new File(cu.a.getParent(), "out.java"));
                 }
 
                 // Then
