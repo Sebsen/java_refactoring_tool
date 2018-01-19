@@ -47,9 +47,9 @@ public class Driver {
         cb.stream().forEach(polledFile -> {
             try {
                 System.out.println(polledFile.getName() + ": ");
-                List<ClassOrInterfaceType> fieldDeclaration = Navigator.findAllNodesOfGivenClass(CompilationUnitFactory.createPreservingCompilationUnit(polledFile).b,
+                List<ClassOrInterfaceType> fieldDeclaration = Navigator.findAllNodesOfGivenClass(CompilationUnitFactory.createPreservingCompilationUnit(polledFile).getCompilationUnit(),
                         ClassOrInterfaceType.class);
-                List<ObjectCreationExpr> fieldDeclaration2 = Navigator.findAllNodesOfGivenClass(CompilationUnitFactory.createPreservingCompilationUnit(polledFile).b,
+                List<ObjectCreationExpr> fieldDeclaration2 = Navigator.findAllNodesOfGivenClass(CompilationUnitFactory.createPreservingCompilationUnit(polledFile).getCompilationUnit(),
                         ObjectCreationExpr.class);
 //                ResolvedType fieldType = JavaParserFacade.get(mySolver).convertToUsage(f.getVariables().get(0).getType(), f);
                 fieldDeclaration.forEach(d -> {
@@ -74,7 +74,7 @@ public class Driver {
         System.out.println(matchingFiles);
 
         final TypeSolver mySolver = new CombinedTypeSolver(new ReflectionTypeSolver(), new JavaParserTypeSolver(matchingFiles.iterator().next().getParentFile()));
-        List<FieldDeclaration> fieldDeclaration = Navigator.findAllNodesOfGivenClass(CompilationUnitFactory.createPreservingCompilationUnit(matchingFiles.iterator().next()).b,
+        List<FieldDeclaration> fieldDeclaration = Navigator.findAllNodesOfGivenClass(CompilationUnitFactory.createPreservingCompilationUnit(matchingFiles.iterator().next()).getCompilationUnit(),
                 FieldDeclaration.class);
         fieldDeclaration.forEach(f -> {
             ResolvedType fieldType = JavaParserFacade.get(mySolver).convertToUsage(f.getVariables().get(0).getType(), f);
@@ -92,8 +92,8 @@ public class Driver {
         ((CombinedTypeSolver) mySolver).add(new JavaParserTypeSolver(new File("C:/Entwicklung/eclipse_workspaces/default/java-parser/src/main/java/")));
 
         // Create new preserving compilation unit
-        final Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(matchingFiles.iterator().next());
-        final List<ImportDeclaration> fieldDeclarations = Navigator.findAllNodesOfGivenClass(cu.b, ImportDeclaration.class);
+        final CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(matchingFiles.iterator().next());
+        final List<ImportDeclaration> fieldDeclarations = Navigator.findAllNodesOfGivenClass(cu.getCompilationUnit(), ImportDeclaration.class);
 
         ImportDeclaration imp = fieldDeclarations.get(0);
         ResolvedReferenceTypeDeclaration solvedType = mySolver.solveType(StringBuffer.class.getName());

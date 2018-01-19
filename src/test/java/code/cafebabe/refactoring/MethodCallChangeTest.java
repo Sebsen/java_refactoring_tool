@@ -81,7 +81,7 @@ public class MethodCallChangeTest {
                 final CompilationUnit changed = change.apply(cu.getCompilationUnit(), mySolver);
 
                 // Then
-                assertEquals(CompilationUnitFactory.createPreservingCompilationUnit(target).b.toString(), changed.toString());
+                assertEquals(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit().toString(), changed.toString());
 
             } catch (FileNotFoundException e) {
                 fail("Exception has been thrown! " + e.getClass().getName());
@@ -128,7 +128,7 @@ public class MethodCallChangeTest {
 
                 // Then
                 assertEquals(LexicalPreservingPrinter
-                        .print(CompilationUnitFactory.createPreservingCompilationUnit(target).b),
+                        .print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
                         LexicalPreservingPrinter.print(changed));
 
             } catch (IOException e) {
@@ -178,7 +178,7 @@ public class MethodCallChangeTest {
                 }
 
                 // Then
-                assertEquals(CompilationUnitFactory.createPreservingCompilationUnit(target).b.toString(), changed.toString());
+                assertEquals(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit().toString(), changed.toString());
 
             } catch (IOException e) {
                 fail("Exception has been thrown! " + e.getClass().getName());

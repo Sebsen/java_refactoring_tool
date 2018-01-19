@@ -1,6 +1,6 @@
 package code.cafebabe.refactoring.factory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +13,7 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 import com.github.javaparser.symbolsolver.javaparser.Navigator;
 import com.github.javaparser.utils.Pair;
 
-import code.cafebabe.refactoring.factory.CompilationUnitFactory;
+import code.cafebabe.refactoring.CompilationUnitWrapper;
 
 public class CompilationUnitFactoryTest {
 
@@ -21,15 +21,15 @@ public class CompilationUnitFactoryTest {
 
     @Test
     public void compilationUnitIsPrintedAsIs() throws FileNotFoundException {
-        final Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(new File("src/test/resources/UglyTestFile.java"));
-        assertEquals("The lexical preservation of original and parsed source file is lost!", UGLY_TEST_FILE, LexicalPreservingPrinter.print(cu.b));
+        final CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(new File("src/test/resources/UglyTestFile.java"));
+        assertEquals("The lexical preservation of original and parsed source file is lost!", UGLY_TEST_FILE, LexicalPreservingPrinter.print(cu.getCompilationUnit()));
     }
 
     @Test
     public void compilationUnitIsPrintedAsIs2() throws FileNotFoundException {
-        final Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(
+        final CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(
                 new File("src/test/resources/complexClass/complexClass/ComplexClass.java"));
-        Navigator.findAllNodesOfGivenClass(cu.b, Expression.class).forEach(e -> {
+        Navigator.findAllNodesOfGivenClass(cu.getCompilationUnit(), Expression.class).forEach(e -> {
             // if (e.isMethodCallExpr()) {
             // System.out.println("FoundExpression: " + e);
             // System.out.println("\tChildren: " + e.getChildNodes());

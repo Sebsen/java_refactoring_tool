@@ -18,8 +18,8 @@ public class CompilationUnitFactory {
     private CompilationUnitFactory() {
     }
     
-    public static Pair<File, CompilationUnit> createPreservingCompilationUnit(final File pFromFile) throws FileNotFoundException {
-        return new Pair<>(pFromFile, LexicalPreservingPrinter.setup(JavaParser.parse(pFromFile)));
+    public static CompilationUnitWrapper createPreservingCompilationUnit(final File pFromFile) throws FileNotFoundException {
+        return CompilationUnitWrapper.createCompilationUnitWrapper(pFromFile, LexicalPreservingPrinter.setup(JavaParser.parse(pFromFile)));
     }
 
     public static CompilationUnitWrapper createPreservingCompilationUnit(final File pFromFile, final TypeSolver pTypeSolver) throws FileNotFoundException {
