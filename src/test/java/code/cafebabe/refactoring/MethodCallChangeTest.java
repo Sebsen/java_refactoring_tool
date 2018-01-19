@@ -75,10 +75,10 @@ public class MethodCallChangeTest {
                 final TypeSolver mySolver = TypeSolverFactory.createFrom(codeBase);
 
                 // Create new preserving compilation unit
-                Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(next, mySolver);
+                CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(next, mySolver);
 
                 // Apply change and print
-                final CompilationUnit changed = change.apply(cu.b, mySolver);
+                final CompilationUnit changed = change.apply(cu.getCompilationUnit(), mySolver);
 
                 // Then
                 assertEquals(CompilationUnitFactory.createPreservingCompilationUnit(target).b.toString(), changed.toString());
@@ -116,14 +116,14 @@ public class MethodCallChangeTest {
                 final TypeSolver mySolver = TypeSolverFactory.createFrom(codeBase);
 
                 // Create new preserving compilation unit
-                Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(next, mySolver);
+                CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(next, mySolver);
 
                 // Apply change and print
-                final CompilationUnit changed = change.apply(cu.b, mySolver);
+                final CompilationUnit changed = change.apply(cu.getCompilationUnit(), mySolver);
 
                 boolean writeToFile = true;
                 if (writeToFile) {
-                    CompilationUnitWriter.writeToFile(changed, new File(cu.a.getParent(), "out.java"));
+                    CompilationUnitWriter.writeToFile(changed, new File(cu.getSourceFile().getParent(), "out.java"));
                 }
 
                 // Then
@@ -167,14 +167,14 @@ public class MethodCallChangeTest {
                 final TypeSolver mySolver = TypeSolverFactory.createFrom(codeBase);
 
                 // Create new preserving compilation unit
-                Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(next, mySolver);
+                CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(next, mySolver);
 
                 // Apply change and print
-                final CompilationUnit changed = change.apply(cu.b, mySolver);
+                final CompilationUnit changed = change.apply(cu.getCompilationUnit(), mySolver);
 
                 boolean writeToFile = true;
                 if (writeToFile) {
-                    CompilationUnitWriter.writeToFile(changed, new File(cu.a.getParent(), "out.java"));
+                    CompilationUnitWriter.writeToFile(changed, new File(cu.getSourceFile().getParent(), "out.java"));
                 }
 
                 // Then

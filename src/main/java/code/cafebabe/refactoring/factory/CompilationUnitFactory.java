@@ -11,6 +11,8 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.utils.Pair;
 
+import code.cafebabe.refactoring.CompilationUnitWrapper;
+
 public class CompilationUnitFactory {
     
     private CompilationUnitFactory() {
@@ -20,21 +22,21 @@ public class CompilationUnitFactory {
         return new Pair<>(pFromFile, LexicalPreservingPrinter.setup(JavaParser.parse(pFromFile)));
     }
 
-    public static Pair<File, CompilationUnit> createPreservingCompilationUnit(final File pFromFile, final TypeSolver pTypeSolver) throws FileNotFoundException {
+    public static CompilationUnitWrapper createPreservingCompilationUnit(final File pFromFile, final TypeSolver pTypeSolver) throws FileNotFoundException {
         JavaSymbolSolver symbolResolver = new JavaSymbolSolver(pTypeSolver);
 //        debugParameter(pTypeSolver, symbolResolver);
         JavaParser.getStaticConfiguration().setSymbolResolver(symbolResolver);
         JavaParser.getStaticConfiguration().setValidator(new Java6Validator());
         JavaParser.getStaticConfiguration().setDoNotAssignCommentsPrecedingEmptyLines(false);
         
-        return new Pair<>(pFromFile, LexicalPreservingPrinter.setup(JavaParser.parse(pFromFile)));
+        return CompilationUnitWrapper.createCompilationUnitWrapper(pFromFile, LexicalPreservingPrinter.setup(JavaParser.parse(pFromFile)));
     }
 
-    public static Pair<File, CompilationUnit> createCompilationUnit(final File pFromFile, final TypeSolver pTypeSolver) throws FileNotFoundException {
+    public static CompilationUnitWrapper createCompilationUnit(final File pFromFile, final TypeSolver pTypeSolver) throws FileNotFoundException {
         JavaSymbolSolver symbolResolver = new JavaSymbolSolver(pTypeSolver);
 //        debugParameter(pTypeSolver, symbolResolver);
         JavaParser.getStaticConfiguration().setSymbolResolver(symbolResolver);
-        return new Pair<>(pFromFile, JavaParser.parse(pFromFile));
+        return CompilationUnitWrapper.createCompilationUnitWrapper(pFromFile, JavaParser.parse(pFromFile));
     }
 
     private static void debugParameter(final TypeSolver pTypeSolver, JavaSymbolSolver symbolResolver) {

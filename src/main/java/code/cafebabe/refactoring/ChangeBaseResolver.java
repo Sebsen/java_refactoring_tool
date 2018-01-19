@@ -33,12 +33,12 @@ public class ChangeBaseResolver {
             try {
                 // Create new preserving compilation unit
                 final TypeSolver mySolver = TypeSolverFactory.createFrom(codeBase);
-                Pair<File, CompilationUnit> cu = CompilationUnitFactory.createPreservingCompilationUnit(codeBaseIterator.next(), mySolver);
+                CompilationUnitWrapper cu = CompilationUnitFactory.createPreservingCompilationUnit(codeBaseIterator.next(), mySolver);
                 // final List<ImportDeclaration> fieldDeclarations = Navigator.findAllNodesOfGivenClass(cu.b, ImportDeclaration.class);
                 // final List<MethodCallExpr> fieldDeclarations = Navigator.findAllNodesOfGivenClass(cu.b, MethodCallExpr.class);
-                final List<Node> fieldDeclarations = Navigator.findAllNodesOfGivenClass(cu.b, Node.class);
+                final List<Node> fieldDeclarations = Navigator.findAllNodesOfGivenClass(cu.getCompilationUnit(), Node.class);
 
-                fieldDeclarations.stream().filter(m -> changeToApply.isApplyable(m, mySolver)).forEach(e -> matchingFiles.add(cu.a));
+                fieldDeclarations.stream().filter(m -> changeToApply.isApplyable(m, mySolver)).forEach(e -> matchingFiles.add(cu.getSourceFile()));
 
             } catch (FileNotFoundException e1) {
                 // TODO Auto-generated catch block
