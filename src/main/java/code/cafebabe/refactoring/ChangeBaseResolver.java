@@ -21,9 +21,9 @@ public class ChangeBaseResolver {
     private final CodeBase codeBase;
     private final Refactoring changeToApply;
 
-    public ChangeBaseResolver(final CodeBase pCodeBase, final Refactoring pChange) {
+    public ChangeBaseResolver(final CodeBase pCodeBase, final Refactoring pRefactoring) {
         codeBase = pCodeBase;
-        changeToApply = pChange;
+        changeToApply = pRefactoring;
     }
 
     public Set<File> resolve() {

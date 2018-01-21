@@ -18,7 +18,7 @@ import code.cafebabe.refactoring.factory.TypeSolverFactory;
 public class SingleThreadedProcessor extends RefactoringProcessor {
 
 	@Override
-	protected Set<CompilationUnit> processChanges(CodeBase pCodeBase, Refactoring pChange) {
+	protected Set<CompilationUnit> processChanges(CodeBase pCodeBase, Refactoring pRefactoring) {
 
 		// Create type solver from CodeBase
 		final TypeSolver mySolver = TypeSolverFactory.createFrom(pCodeBase);
@@ -39,7 +39,7 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 			}
 
 			// Apply change
-			changes.add(pChange.apply(cu.getCompilationUnit(), mySolver));
+			changes.add(pRefactoring.apply(cu.getCompilationUnit(), mySolver));
 		}
 
 		return changes;
