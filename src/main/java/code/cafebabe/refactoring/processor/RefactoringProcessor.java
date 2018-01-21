@@ -10,14 +10,14 @@ import code.cafebabe.refactoring.CodeBase;
 public abstract class RefactoringProcessor {
 
 	public Set<CompilationUnit> process(final CodeBase pCodeBase, final Refactoring pRefactoring) {
-		final Set<CompilationUnit> changes = processChanges(pCodeBase, pRefactoring);
-		reviewChanges();
-		writeChangesToFile();
+		final Set<CompilationUnit> changes = processRefactorings(pCodeBase, pRefactoring);
+		reviewRefactorings();
+		writeRefactoringsToFile();
 		return changes;
 	}
 	
-	protected abstract Set<CompilationUnit> processChanges(final CodeBase pCodeBase, final Refactoring pRefactoring);
-	protected abstract void reviewChanges();
-	protected abstract void writeChangesToFile();
+	protected abstract Set<CompilationUnit> processRefactorings(final CodeBase pCodeBase, final Refactoring pRefactoring);
+	protected abstract void reviewRefactorings();
+	protected abstract void writeRefactoringsToFile();
 	
 }
