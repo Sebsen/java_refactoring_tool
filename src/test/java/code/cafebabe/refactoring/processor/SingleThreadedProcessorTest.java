@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
-import code.cafebabe.refactoring.Change;
+import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodCallChange;
 import code.cafebabe.refactoring.MethodCallChange.ActionType;
@@ -29,7 +29,7 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void test() throws FileNotFoundException {
-        final Change change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
         final String testFolderName = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String targetFileName = "ComplexClassAfterRemoval.java";

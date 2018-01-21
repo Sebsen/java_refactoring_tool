@@ -24,7 +24,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.google.common.collect.Lists;
 
-public class MethodCallChange extends Change {
+public class MethodCallChange extends Refactoring {
 
     private boolean trustImportStatements = true;
     private final Action action;
@@ -186,7 +186,7 @@ public class MethodCallChange extends Change {
             return this;
         }
 
-        public Change build() {
+        public Refactoring build() {
             if (target == null) {
                 throw new IllegalStateException("No target to look for! Call \"andTarget\" first!");
             }

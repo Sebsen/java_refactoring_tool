@@ -5,7 +5,7 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
-public class ClassOrInterfaceTypeChange extends Change {
+public class ClassOrInterfaceTypeChange extends Refactoring {
     
     public ClassOrInterfaceTypeChange(final Class<?> pTargetType, final Class<?> pReplacementType) {
         super(pTargetType, pReplacementType);

@@ -19,9 +19,9 @@ import code.cafebabe.refactoring.factory.TypeSolverFactory;
 public class ChangeBaseResolver {
 
     private final CodeBase codeBase;
-    private final Change changeToApply;
+    private final Refactoring changeToApply;
 
-    public ChangeBaseResolver(final CodeBase pCodeBase, final Change pChange) {
+    public ChangeBaseResolver(final CodeBase pCodeBase, final Refactoring pChange) {
         codeBase = pCodeBase;
         changeToApply = pChange;
     }

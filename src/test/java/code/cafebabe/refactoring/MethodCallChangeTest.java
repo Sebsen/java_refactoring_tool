@@ -34,7 +34,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.utils.Pair;
 
-import code.cafebabe.refactoring.Change;
+import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodCallChange;
 import code.cafebabe.refactoring.MethodCallChange.ActionType;
@@ -56,7 +56,7 @@ public class MethodCallChangeTest {
     public void removingActionGivesExpectedResult(final String pTestFolderName, final String pTestClassName, final String pTestClassTargetName) {
 
         // Given
-        final Change change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
         final File testBase = new File(TEST_RESOURCES_BASE, pTestFolderName);
         final File target = new File(TEST_RESOURCES_TARGETS, pTestFolderName + pTestClassTargetName);
 
@@ -94,7 +94,7 @@ public class MethodCallChangeTest {
     public void removingActionGivesExpectedResult2() {
 
         // Given
-        final Change change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallChange.ChangeBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
         final String testFolderMain = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String targetFileName = "ComplexClassAfterRemoval.java";
@@ -145,7 +145,7 @@ public class MethodCallChangeTest {
     public void extendingActionGivesExpectedResult() {
 
         // Given
-        final Change change = MethodCallChange.ChangeBuilder.ofAction(ActionType.EXTENDER).andTarget(Logger.class).andReplacement(org.slf4j.Logger.class).build();
+        final Refactoring change = MethodCallChange.ChangeBuilder.ofAction(ActionType.EXTENDER).andTarget(Logger.class).andReplacement(org.slf4j.Logger.class).build();
         final String testFolderMain = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String testFileTargetName = "ComplexClassAfterExtension.java";
