@@ -24,12 +24,12 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.google.common.collect.Lists;
 
-public class MethodCallChange extends Refactoring {
+public class MethodCallRefactoring extends Refactoring {
 
     private boolean trustImportStatements = true;
     private final Action action;
 
-    private MethodCallChange(final Class<?> pTargetType, final Action pAction, final Class<?> pReplacement) {
+    private MethodCallRefactoring(final Class<?> pTargetType, final Action pAction, final Class<?> pReplacement) {
         super(pTargetType, pReplacement);
         action = pAction;
     }
@@ -160,28 +160,28 @@ public class MethodCallChange extends Refactoring {
         REMOVAL, EXTENDER;
     }
 
-    public static class ChangeBuilder {
+    public static class RefactoringBuilder {
 
         private Action action;
         private Class<?> target;
         private Class<?> replacement;
 
-        public ChangeBuilder(final Action pAction) {
+        public RefactoringBuilder(final Action pAction) {
             action = pAction;
         }
 
-        public static ChangeBuilder ofAction(final ActionType pAction) {
+        public static RefactoringBuilder ofAction(final ActionType pAction) {
             switch (pAction) {
                 case EXTENDER:
-                    return new ChangeBuilder(new ExtendingAction());
+                    return new RefactoringBuilder(new ExtendingAction());
                 case REMOVAL:
-                    return new ChangeBuilder(new RemovingAction());
+                    return new RefactoringBuilder(new RemovingAction());
                 default:
                     throw new IllegalArgumentException();
             }
         }
 
-        public ChangeBuilder andTarget(final Class<?> pTarget) {
+        public RefactoringBuilder andTarget(final Class<?> pTarget) {
             target = pTarget;
             return this;
         }
@@ -190,10 +190,10 @@ public class MethodCallChange extends Refactoring {
             if (target == null) {
                 throw new IllegalStateException("No target to look for! Call \"andTarget\" first!");
             }
-            return new MethodCallChange(target, action, replacement);
+            return new MethodCallRefactoring(target, action, replacement);
         }
 
-        public ChangeBuilder andReplacement(final Class<?> pClassToReplaceWith) {
+        public RefactoringBuilder andReplacement(final Class<?> pClassToReplaceWith) {
             replacement = pClassToReplaceWith;
             return this;
         }
