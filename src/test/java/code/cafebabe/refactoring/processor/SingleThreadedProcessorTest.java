@@ -1,11 +1,12 @@
 package code.cafebabe.refactoring.processor;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.junit.platform.runner.JUnitPlatform;
@@ -42,12 +43,18 @@ public class SingleThreadedProcessorTest {
 
 		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
 
-		final Set<String> changes2 = changes.stream().map(Change::getTransformed).map(LexicalPreservingPrinter::print)
-				.collect(Collectors.toSet());
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
 
-		assertTrue(changes2.contains(LexicalPreservingPrinter
-				.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit())));
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
 
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
 	}
 
 }

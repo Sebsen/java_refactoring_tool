@@ -11,7 +11,7 @@ import com.github.javaparser.ast.CompilationUnit;
  */
 public final class Change {
 
-	private CompilationUnitWrapper compilationUnitWrapper;
+	private CompilationUnitWrapper original;
 	// TODO: Instead of storing compilation unit before and after only list of
 	// diffs (or actions or similar) should be stored here. All diffs
 	// applied to base code base then lead to final changed one => Each
@@ -20,12 +20,16 @@ public final class Change {
 	private CompilationUnit transformed;
 
 	private Change(final CompilationUnitWrapper pCompilationUnitWrapper, final CompilationUnit pChangedCompilationUnit) {
-		compilationUnitWrapper = pCompilationUnitWrapper;
+		original = pCompilationUnitWrapper;
 		transformed = pChangedCompilationUnit;
 	}
 
 	public CompilationUnit getTransformed() {
 		return transformed;
+	}
+
+	public CompilationUnitWrapper getOriginal() {
+		return original;
 	}
 	
 	public static Change createFrom(final CompilationUnitWrapper pCompilationUnitWrapper,
