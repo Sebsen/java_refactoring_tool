@@ -1,6 +1,6 @@
 package code.cafebabe.refactoring.processor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,40 +11,42 @@ import org.junit.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
-import code.cafebabe.refactoring.Refactoring;
+import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodCallRefactoring;
 import code.cafebabe.refactoring.MethodCallRefactoring.ActionType;
+import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import complexClass.custom.Logger;
 
 @RunWith(JUnitPlatform.class)
 public class SingleThreadedProcessorTest {
-	
+
 	private static final File TEST_RESOURCES_BASE = new File("src/test/resources/");
-    private static final File TEST_RESOURCES_TARGETS = new File(TEST_RESOURCES_BASE, "targets");
+	private static final File TEST_RESOURCES_TARGETS = new File(TEST_RESOURCES_BASE, "targets");
 
 	@Test
 	public void test() throws FileNotFoundException {
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
-        final String testFolderName = "complexClass/";
-        final String testFileName = "ComplexClass.java";
-        final String targetFileName = "ComplexClassAfterRemoval.java";
-        final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
-        final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+		final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(ActionType.REMOVAL)
+				.andTarget(Logger.class).build();
+		final String testFolderName = "complexClass/";
+		final String testFileName = "ComplexClass.java";
+		final String targetFileName = "ComplexClassAfterRemoval.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
 
-        final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
-                .build();
-        
-        final Set<CompilationUnit> changes = new SingleThreadedProcessor().process(codeBase, change);
-        
-        final Set<String> changes2 = changes.stream().map(LexicalPreservingPrinter::print).collect(Collectors.toSet());
-        
-        assertTrue(changes2.contains(LexicalPreservingPrinter
-                .print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit())));
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Set<String> changes2 = changes.stream().map(Change::getTransformed).map(LexicalPreservingPrinter::print)
+				.collect(Collectors.toSet());
+
+		assertTrue(changes2.contains(LexicalPreservingPrinter
+				.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit())));
 
 	}
 

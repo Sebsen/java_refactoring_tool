@@ -9,20 +9,21 @@ import java.util.Set;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
-import code.cafebabe.refactoring.Refactoring;
+import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.CompilationUnitWrapper;
+import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import code.cafebabe.refactoring.factory.TypeSolverFactory;
 
 public class SingleThreadedProcessor extends RefactoringProcessor {
 
 	@Override
-	protected Set<CompilationUnit> processRefactorings(CodeBase pCodeBase, Refactoring pRefactoring) {
+	protected Set<Change> processRefactorings(final CodeBase pCodeBase, final Refactoring pRefactoring) {
 
 		// Create type solver from CodeBase
 		final TypeSolver mySolver = TypeSolverFactory.createFrom(pCodeBase);
-		final Set<CompilationUnit> changes = new LinkedHashSet<>();
+		final Set<Change> changes = new LinkedHashSet<>();
 
 		final Iterator<File> codeBaseIterator = pCodeBase.iterator();
 		while (codeBaseIterator.hasNext()) {
@@ -39,7 +40,7 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 			}
 
 			// Apply change
-			changes.add(pRefactoring.apply(cu.getCompilationUnit(), mySolver));
+			changes.add(Change.createFrom(cu, pRefactoring.apply(cu.getCompilationUnit(), mySolver)));
 		}
 
 		return changes;

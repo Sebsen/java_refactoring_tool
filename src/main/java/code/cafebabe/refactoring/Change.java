@@ -17,13 +17,17 @@ public final class Change {
 	// applied to base code base then lead to final changed one => Each
 	// individual change/ diff then could be reviewed
 	// and individually approved or rejected
-	private CompilationUnit changed;
+	private CompilationUnit transformed;
 
 	private Change(final CompilationUnitWrapper pCompilationUnitWrapper, final CompilationUnit pChangedCompilationUnit) {
 		compilationUnitWrapper = pCompilationUnitWrapper;
-		changed = pChangedCompilationUnit;
+		transformed = pChangedCompilationUnit;
 	}
 
+	public CompilationUnit getTransformed() {
+		return transformed;
+	}
+	
 	public static Change createFrom(final CompilationUnitWrapper pCompilationUnitWrapper,
 			final CompilationUnit pChangedCompilationUnit) {
 		return new Change(pCompilationUnitWrapper, pChangedCompilationUnit);
