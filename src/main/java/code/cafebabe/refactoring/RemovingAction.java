@@ -10,7 +10,7 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
 
-class RemovingAction extends Action {
+public final class RemovingAction extends Action {
 
     @Override
     public void consume(final List<Node> pNodesToProcess, Optional<FieldDeclaration> matchingFieldDeclarationsForReplacementType) {

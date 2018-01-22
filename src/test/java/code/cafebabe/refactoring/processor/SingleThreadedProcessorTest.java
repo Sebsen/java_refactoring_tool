@@ -18,7 +18,7 @@ import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodCallRefactoring;
 import code.cafebabe.refactoring.Refactoring;
-import code.cafebabe.refactoring.Refactoring.ActionType;
+import code.cafebabe.refactoring.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import complexClass.custom.Logger;
 
@@ -30,7 +30,7 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void test() throws FileNotFoundException {
-		final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(ActionType.REMOVAL)
+		final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(new RemovingAction())
 				.andTarget(Logger.class).build();
 		final String testFolderName = "complexClass/";
 		final String testFileName = "ComplexClass.java";
@@ -59,7 +59,7 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void methodCallInstanceIsConvertedToField() throws FileNotFoundException {
-		final Refactoring change = Refactoring.RefactoringBuilder.ofAction(ActionType.REMOVAL)
+		final Refactoring change = Refactoring.RefactoringBuilder.ofAction(new RemovingAction())
 				.andTarget(Logger.class).build();
 		final String testFolderName = "introduceField/";
 		final String testFileName = "MethodCallClass.java";

@@ -31,7 +31,6 @@ import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
-import code.cafebabe.refactoring.Refactoring.ActionType;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import code.cafebabe.refactoring.factory.TypeSolverFactory;
 import code.cafebabe.refactoring.util.CompilationUnitWriter;
@@ -50,7 +49,7 @@ public class MethodCallRefactoringTest {
     public void removingActionGivesExpectedResult(final String pTestFolderName, final String pTestClassName, final String pTestClassTargetName) {
 
         // Given
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(new RemovingAction()).andTarget(Logger.class).build();
         final File testBase = new File(TEST_RESOURCES_BASE, pTestFolderName);
         final File target = new File(TEST_RESOURCES_TARGETS, pTestFolderName + pTestClassTargetName);
 
@@ -88,7 +87,7 @@ public class MethodCallRefactoringTest {
     public void removingActionGivesExpectedResult2() {
 
         // Given
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(ActionType.REMOVAL).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(new RemovingAction()).andTarget(Logger.class).build();
         final String testFolderMain = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String targetFileName = "ComplexClassAfterRemoval.java";
@@ -139,7 +138,7 @@ public class MethodCallRefactoringTest {
     public void extendingActionGivesExpectedResult() {
 
         // Given
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(ActionType.EXTENDER).andTarget(Logger.class).andReplacement(org.slf4j.Logger.class).build();
+        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.ofAction(new ExtendingAction()).andTarget(Logger.class).andReplacement(org.slf4j.Logger.class).build();
         final String testFolderMain = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String testFileTargetName = "ComplexClassAfterExtension.java";

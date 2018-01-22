@@ -16,7 +16,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 
-public class ExtendingAction extends Action {
+public final class ExtendingAction extends Action {
 
     @Override
     public void consume(final List<Node> pNodesToProcess, final Optional<FieldDeclaration> p) {
