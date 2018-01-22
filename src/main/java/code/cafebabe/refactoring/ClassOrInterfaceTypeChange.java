@@ -12,8 +12,8 @@ public class ClassOrInterfaceTypeChange extends Refactoring {
     }
 
     @Override
-    public <T extends Node> boolean isApplyable(final T pNode, TypeSolver pMySolver) {
-        return pNode instanceof ImportDeclaration && ((ImportDeclaration) pNode).getNameAsString().equals(targetType.getName());
+    public <T extends Node> boolean isApplyable(final T pNode, final Class<?> pTargetType, TypeSolver pMySolver) {
+        return pNode instanceof ImportDeclaration && ((ImportDeclaration) pNode).getNameAsString().equals(pTargetType.getName());
     }
 
     @Override
