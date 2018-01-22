@@ -2,7 +2,7 @@ package complexClass.custom;
 
 public class MessageLogger {
 
-    public Logger instance() {
+    public static Logger instance() {
         return new Logger();
     }
 

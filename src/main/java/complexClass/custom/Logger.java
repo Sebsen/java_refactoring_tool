@@ -3,6 +3,10 @@ package complexClass.custom;
 import org.slf4j.Marker;
 
 public class Logger implements org.slf4j.Logger {
+	
+	public void logAsInternalException(Throwable e) {
+		// Individual test method
+	}
 
     @Override
     public void debug(String arg0) {
