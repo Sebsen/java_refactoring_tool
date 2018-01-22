@@ -31,6 +31,8 @@ import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
+import code.cafebabe.refactoring.action.ExtendingAction;
+import code.cafebabe.refactoring.action.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import code.cafebabe.refactoring.factory.TypeSolverFactory;
 import code.cafebabe.refactoring.util.CompilationUnitWriter;

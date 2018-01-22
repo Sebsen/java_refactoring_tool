@@ -19,6 +19,8 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.google.common.collect.Lists;
 
+import code.cafebabe.refactoring.action.Action;
+
 public class MethodCallRefactoring extends Refactoring {
 
 	private boolean trustImportStatements = true;

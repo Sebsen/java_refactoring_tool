@@ -18,7 +18,7 @@ import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodCallRefactoring;
 import code.cafebabe.refactoring.Refactoring;
-import code.cafebabe.refactoring.RemovingAction;
+import code.cafebabe.refactoring.action.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import complexClass.custom.Logger;
 

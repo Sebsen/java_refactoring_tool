@@ -1,4 +1,4 @@
-package code.cafebabe.refactoring;
+package code.cafebabe.refactoring.action;
 
 import java.util.Iterator;
 import java.util.List;

@@ -14,6 +14,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparser.Navigator;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
+import code.cafebabe.refactoring.action.Action;
+
 public abstract class Refactoring {
 
 	public static class RefactoringBuilder {
