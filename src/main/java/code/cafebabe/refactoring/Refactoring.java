@@ -28,7 +28,7 @@ public abstract class Refactoring {
 			action = pAction;
 		}
 
-		public static RefactoringBuilder ofAction(final Action pAction) {
+		public static RefactoringBuilder of(final Action pAction) {
 			return new RefactoringBuilder(pAction);
 		}
 
