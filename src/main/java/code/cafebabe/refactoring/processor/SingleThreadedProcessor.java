@@ -47,14 +47,14 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 	}
 
 	@Override
-	protected void reviewRefactorings() {
-		// TODO Auto-generated method stub
-
+	protected Set<Change> reviewRefactorings(final Set<Change> pChangesToReview) {
+		return pChangesToReview;
 	}
 
 	@Override
-	protected void writeRefactoringsToFile() {
-		// TODO Auto-generated method stub
+	protected void persistChanges(final Set<Change> pChangesToPersist) {
+		// Persist changes by simply storing it into it's original source files
+		
 		// CompilationUnitWriter.writeToFile(changed, new
 		// File(cu.getSourceFile().getParent(), "out.java"));
 

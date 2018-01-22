@@ -25,6 +25,8 @@ public final class Change {
 	}
 
 	public CompilationUnit getTransformed() {
+		// TODO: Should return a clone of current compilation unit (to be immutable) but is currently not possible due to issues with
+		// lexical preservation and issues with java-parser library
 		return transformed;
 	}
 
