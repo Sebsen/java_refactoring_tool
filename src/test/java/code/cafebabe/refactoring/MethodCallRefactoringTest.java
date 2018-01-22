@@ -3,10 +3,8 @@ package code.cafebabe.refactoring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -32,12 +30,8 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
-import com.github.javaparser.utils.Pair;
 
-import code.cafebabe.refactoring.Refactoring;
-import code.cafebabe.refactoring.CodeBase;
-import code.cafebabe.refactoring.MethodCallRefactoring;
-import code.cafebabe.refactoring.MethodCallRefactoring.ActionType;
+import code.cafebabe.refactoring.Refactoring.ActionType;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import code.cafebabe.refactoring.factory.TypeSolverFactory;
 import code.cafebabe.refactoring.util.CompilationUnitWriter;

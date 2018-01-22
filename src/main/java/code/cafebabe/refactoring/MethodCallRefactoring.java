@@ -1,24 +1,19 @@
 package code.cafebabe.refactoring;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.resolution.MethodUsage;
-import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparser.Navigator;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
@@ -29,7 +24,7 @@ public class MethodCallRefactoring extends Refactoring {
     private boolean trustImportStatements = true;
     private final Action action;
 
-    private MethodCallRefactoring(final Class<?> pTargetType, final Action pAction, final Class<?> pReplacement) {
+    MethodCallRefactoring(final Class<?> pTargetType, final Action pAction, final Class<?> pReplacement) {
         super(pTargetType, pReplacement);
         action = pAction;
     }
@@ -121,82 +116,5 @@ public class MethodCallRefactoring extends Refactoring {
     private boolean isReturnTypeTargetType(final MethodUsage pResolvedMethodCall, final Class<?> pTargetType) {
         return pResolvedMethodCall.returnType().isReferenceType()
                 && pResolvedMethodCall.returnType().describe().equals(pTargetType.getName());
-    }
-
-    private Set<VariableDeclarationExpr> resolveVariableDeclarations(final MethodDeclaration pMethodDeclarationToProcess,
-                                                                     final Class<?> pTargetType) {
-        final Set<VariableDeclarationExpr> variableDeclarations = new LinkedHashSet<>();
-        Navigator.findAllNodesOfGivenClass(pMethodDeclarationToProcess, VariableDeclarationExpr.class).forEach(v -> {
-            final ResolvedType resolvedVariableType = v.calculateResolvedType();
-            if (resolvedVariableType.isReferenceType()
-                    && resolvedVariableType.describe().equals(targetType.getName())) {
-                variableDeclarations.add(v);
-            }
-        });
-        return variableDeclarations;
-    }
-
-    private Set<FieldDeclaration> resolveFieldDeclarations(final CompilationUnit pCompilataionUnit,
-                                                           final Class<?> pTargetTypeToLookFor) {
-        final Set<FieldDeclaration> matchingDeclarations = new LinkedHashSet<>();
-        Navigator.findAllNodesOfGivenClass(pCompilataionUnit, FieldDeclaration.class).forEach(fieldDeclaration -> {
-            final ResolvedFieldDeclaration resolvedFieldDeclaration = fieldDeclaration.resolve();
-            if (pTargetTypeToLookFor != null && resolvedFieldDeclaration.getType().isReferenceType()
-                    && resolvedFieldDeclaration.getType().describe().equals(pTargetTypeToLookFor.getName())) {
-                matchingDeclarations.add(fieldDeclaration);
-            }
-        });
-        return matchingDeclarations;
-    }
-
-    private boolean doImportsContainTargetType(final CompilationUnit pCompilationUnitToCheck,
-                                               final Class<?> pTargetTypeToLookFor) {
-        return 1 == Navigator.findAllNodesOfGivenClass(pCompilationUnitToCheck, ImportDeclaration.class).stream()
-                .map(ImportDeclaration::getNameAsString)
-                .filter(pTargetTypeToLookFor.getName()::equals).count();
-    }
-
-    public enum ActionType {
-        REMOVAL, EXTENDER;
-    }
-
-    public static class RefactoringBuilder {
-
-        private Action action;
-        private Class<?> target;
-        private Class<?> replacement;
-
-        public RefactoringBuilder(final Action pAction) {
-            action = pAction;
-        }
-
-        public static RefactoringBuilder ofAction(final ActionType pAction) {
-            switch (pAction) {
-                case EXTENDER:
-                    return new RefactoringBuilder(new ExtendingAction());
-                case REMOVAL:
-                    return new RefactoringBuilder(new RemovingAction());
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
-
-        public RefactoringBuilder andTarget(final Class<?> pTarget) {
-            target = pTarget;
-            return this;
-        }
-
-        public Refactoring build() {
-            if (target == null) {
-                throw new IllegalStateException("No target to look for! Call \"andTarget\" first!");
-            }
-            return new MethodCallRefactoring(target, action, replacement);
-        }
-
-        public RefactoringBuilder andReplacement(final Class<?> pClassToReplaceWith) {
-            replacement = pClassToReplaceWith;
-            return this;
-        }
-
     }
 }
