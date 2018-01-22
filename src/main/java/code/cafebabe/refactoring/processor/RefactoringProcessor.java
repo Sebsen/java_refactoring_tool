@@ -17,7 +17,7 @@ public abstract class RefactoringProcessor {
 	 * by calling the
 	 * {@link RefactoringProcessor#processRefactorings(CodeBase, Refactoring)}
 	 * method. Afterwards it calles the {@link #reviewRefactorings(Set)} where
-	 * it post-processes the beforhand computed changes on the code base and
+	 * it post-processes the beforehand computed changes on the code base and
 	 * gives you the ability to filter out undesired changes which then are NOT
 	 * going to be persisted in any way!<br />
 	 * Lastly the {@link #persistChanges(Set)} method is going to be called
@@ -27,7 +27,7 @@ public abstract class RefactoringProcessor {
 	 *            The code base to operate on
 	 * @param pRefactoring
 	 *            The refactoring to execute on the code base
-	 * @return All computed and approved changes after they having been
+	 * @return All computed and approved changes after having been
 	 *         persisted
 	 */
 	public final Set<Change> process(final CodeBase pCodeBase, final Refactoring pRefactoring) {
@@ -71,7 +71,7 @@ public abstract class RefactoringProcessor {
 	/**
 	 * Callback method which is executed after all changes have been processed
 	 * by the {@link #reviewRefactorings(Set)} method. Overwrite method this
-	 * method in your sence of 'persisting' the computed and approved changes.
+	 * method in your sense of 'persisting' the computed and approved changes.
 	 * 
 	 * @param pChangesToPersist
 	 *            The changes which should be persisted
