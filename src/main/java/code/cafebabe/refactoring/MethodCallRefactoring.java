@@ -44,8 +44,8 @@ public class MethodCallRefactoring extends Refactoring {
 		final Optional<FieldDeclaration> matchingFieldDeclarationsForReplacementType = matchingFieldDeclarationsForReplacementTypeIterator
 				.hasNext() ? Optional.of(matchingFieldDeclarationsForReplacementTypeIterator.next()) : Optional.empty();
 
-		final List<MethodDeclaration> methodsToProcess = Navigator.findAllNodesOfGivenClass(pCompilationUnit,
-				MethodDeclaration.class);
+		final List<MethodDeclaration> methodsToProcess = pCompilationUnit.findAll(MethodDeclaration.class);
+
 		methodsToProcess.forEach(m -> {
 			// Process every method in class from bottom to up
 			final List<Node> nodesToProcess = Lists.reverse(m.findFirst(BlockStmt.class).get().getChildNodes()).stream()
