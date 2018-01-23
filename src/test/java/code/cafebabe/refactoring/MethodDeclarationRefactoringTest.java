@@ -38,7 +38,7 @@ import code.cafebabe.refactoring.factory.TypeSolverFactory;
 import code.cafebabe.refactoring.util.CompilationUnitWriter;
 
 @RunWith(JUnitPlatform.class)
-public class MethodCallRefactoringTest {
+public class MethodDeclarationRefactoringTest {
 
     private static final File TEST_RESOURCES_BASE = new File("src/test/resources/");
     private static final File TEST_RESOURCES_TARGETS = new File(TEST_RESOURCES_BASE, "targets");
