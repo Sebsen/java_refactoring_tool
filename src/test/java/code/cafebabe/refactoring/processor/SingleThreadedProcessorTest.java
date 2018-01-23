@@ -20,7 +20,6 @@ import code.cafebabe.refactoring.MethodDeclarationRefactoring;
 import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.action.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
-import complexClass.custom.Logger;
 
 @RunWith(JUnitPlatform.class)
 public class SingleThreadedProcessorTest {
