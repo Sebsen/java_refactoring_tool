@@ -16,36 +16,38 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 public final class RemovingAction extends Action {
 
-    @Override
-    public void consume(final List<Node> pNodesToProcess, Optional<FieldDeclaration> matchingFieldDeclarationsForReplacementType) {
-        // Workaround to remove multiple children from same node in LexicalPreserving printer => Save former parent
-        Optional<Node> parent = Optional.empty();
-        for (final Node node : pNodesToProcess) {
-            parent = parent.isPresent() ? parent : node.getParentNode();
-            parent.ifPresent(n -> n.remove(node));
-        }
-    }
+	@Override
+	public void consume(final List<Node> pNodesToProcess, Set<FieldDeclaration> matchingFieldDeclarationsForTargetType,
+			Set<FieldDeclaration> matchingFieldDeclarationsForReplacementType) {
+		// Workaround to remove multiple children from same node in
+		// LexicalPreserving printer => Save former parent
+		Optional<Node> parent = Optional.empty();
+		for (final Node node : pNodesToProcess) {
+			parent = parent.isPresent() ? parent : node.getParentNode();
+			parent.ifPresent(n -> n.remove(node));
+		}
+	}
 
-    @Override
-    public void consumeFieldDeclarations(final Set<FieldDeclaration> pFieldDeclarations) {
-        pFieldDeclarations.forEach(FieldDeclaration::remove);
-    }
+	@Override
+	public void consumeFieldDeclarations(final Set<FieldDeclaration> pFieldDeclarations) {
+		pFieldDeclarations.forEach(FieldDeclaration::remove);
+	}
 
-    @Override
-    public void consumeImports(final List<ImportDeclaration> pImports, final String pTargetType) {
-        Set<ImportDeclaration> importsToRemove = pImports.stream().filter(i -> i != null).filter(i -> pTargetType.equals(i.getNameAsString()))
-                .collect(Collectors.toSet());
-        importsToRemove.forEach(ImportDeclaration::remove);
-    }
-    
-    @Override
+	@Override
+	public void consumeImports(final List<ImportDeclaration> pImports, final String pTargetType) {
+		Set<ImportDeclaration> importsToRemove = pImports.stream().filter(i -> i != null)
+				.filter(i -> pTargetType.equals(i.getNameAsString())).collect(Collectors.toSet());
+		importsToRemove.forEach(ImportDeclaration::remove);
+	}
+
+	@Override
 	public <T extends Node> boolean isApplyable(T pNode, String pTargetType, TypeSolver pTypeSolver) {
 		if (pNode instanceof ExpressionStmt) {
 			return isApplyable((ExpressionStmt) pNode, pTargetType, pTypeSolver);
 		}
 		return false;
 	}
-	
+
 	private boolean isApplyable(final ExpressionStmt pExpression, final String pTargetType,
 			final TypeSolver pTypeSolver) {
 		final Optional<MethodCallExpr> m = pExpression.findFirst(MethodCallExpr.class);

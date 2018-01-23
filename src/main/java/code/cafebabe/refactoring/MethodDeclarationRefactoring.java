@@ -39,10 +39,8 @@ public class MethodDeclarationRefactoring extends Refactoring {
 
 		final Set<FieldDeclaration> matchingFieldDeclarationsForTargetType = resolveFieldDeclarations(pCompilationUnit,
 				targetType);
-		final Iterator<FieldDeclaration> matchingFieldDeclarationsForReplacementTypeIterator = resolveFieldDeclarations(
-				pCompilationUnit, replacement).iterator();
-		final Optional<FieldDeclaration> matchingFieldDeclarationsForReplacementType = matchingFieldDeclarationsForReplacementTypeIterator
-				.hasNext() ? Optional.of(matchingFieldDeclarationsForReplacementTypeIterator.next()) : Optional.empty();
+		final Set<FieldDeclaration> matchingFieldDeclarationsForReplacementType = resolveFieldDeclarations(
+				pCompilationUnit, replacement);
 		// debugMatchingFields(matchingFieldDeclarations);
 
 		final List<MethodDeclaration> methodsToProcess = Navigator.findAllNodesOfGivenClass(pCompilationUnit,
@@ -52,7 +50,7 @@ public class MethodDeclarationRefactoring extends Refactoring {
 			final List<Node> nodesToProcess = Lists.reverse(m.findFirst(BlockStmt.class).get().getChildNodes()).stream()
 					.filter(child -> action.isApplyable(child, targetType, pTypeSolver)).collect(Collectors.toList());
 
-			action.consume(nodesToProcess, matchingFieldDeclarationsForReplacementType);
+			action.consume(nodesToProcess, matchingFieldDeclarationsForTargetType, matchingFieldDeclarationsForReplacementType);
 		});
 		action.consumeFieldDeclarations(matchingFieldDeclarationsForTargetType);
 		action.consumeImports(pCompilationUnit.getImports(), targetType);
