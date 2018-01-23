@@ -60,7 +60,7 @@ public class SingleThreadedProcessorTest {
 	@Test
 	public void methodCallInstanceIsConvertedToField() throws FileNotFoundException {
 		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction())
-				.andTarget("complexClass.custom.Logger").build();
+				.andTarget("introduceField.custom.Logger").build();
 		final String testFolderName = "introduceField/";
 		final String testFileName = "MethodCallClass.java";
 		final String targetFileName = "MethodCallClassTarget.java";
