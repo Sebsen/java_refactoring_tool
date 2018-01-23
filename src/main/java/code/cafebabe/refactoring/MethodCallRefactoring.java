@@ -23,7 +23,7 @@ import code.cafebabe.refactoring.action.Action;
 
 public class MethodCallRefactoring extends Refactoring {
 
-	private boolean trustImportStatements = true;
+	private boolean trustImportStatements = false;
 	private final Action action;
 
 	MethodCallRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
