@@ -28,8 +28,8 @@ public final class RemovingAction extends Action {
     }
 
     @Override
-    public void consumeImports(final CompilationUnit pCompilationUnit, final Class<?> pTargetType) {
-        Set<ImportDeclaration> importsToRemove = pCompilationUnit.getImports().stream().filter(i -> i != null).filter(i -> pTargetType.getName().equals(i.getNameAsString()))
+    public void consumeImports(final List<ImportDeclaration> pImports, final Class<?> pTargetType) {
+        Set<ImportDeclaration> importsToRemove = pImports.stream().filter(i -> i != null).filter(i -> pTargetType.getName().equals(i.getNameAsString()))
                 .collect(Collectors.toSet());
         importsToRemove.forEach(ImportDeclaration::remove);
     }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -90,7 +90,7 @@ public final class ExtendingAction extends Action {
     }
 
     @Override
-    public void consumeImports(final CompilationUnit pCompilationUnit, final Class<?> pTargetType) {
+    public void consumeImports(final List<ImportDeclaration> pImports, final Class<?> pTargetType) {
         // TODO Auto-generated method stub
 
     }

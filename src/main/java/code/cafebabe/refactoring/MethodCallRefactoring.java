@@ -55,7 +55,7 @@ public class MethodCallRefactoring extends Refactoring {
 			action.consume(nodesToProcess, matchingFieldDeclarationsForReplacementType);
 		});
 		action.consumeFieldDeclarations(matchingFieldDeclarationsForTargetType);
-		action.consumeImports(pCompilationUnit, targetType);
+		action.consumeImports(pCompilationUnit.getImports(), targetType);
 
 		return pCompilationUnit;
 	}
