@@ -18,6 +18,7 @@ import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodDeclarationRefactoring;
 import code.cafebabe.refactoring.Refactoring;
+import code.cafebabe.refactoring.action.FieldConverterAction;
 import code.cafebabe.refactoring.action.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 
@@ -58,7 +59,7 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void methodCallInstanceIsConvertedToField() throws FileNotFoundException {
-		final Refactoring change = Refactoring.RefactoringBuilder.of(new RemovingAction())
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction())
 				.andTarget("complexClass.custom.Logger").build();
 		final String testFolderName = "introduceField/";
 		final String testFileName = "MethodCallClass.java";

@@ -14,6 +14,7 @@ import com.github.javaparser.symbolsolver.javaparser.Navigator;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import code.cafebabe.refactoring.action.Action;
+import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public abstract class Refactoring {
 
@@ -44,6 +45,9 @@ public abstract class Refactoring {
 		public Refactoring build() {
 			if (target == null) {
 				throw new IllegalStateException("No target to look for! Call \"andTarget\" first!");
+			}
+			if (action instanceof FieldConverterAction) {
+				return new MethodCallRefactoring(target, action, replacement);
 			}
 			return new MethodDeclarationRefactoring(target, action, replacement);
 		}
