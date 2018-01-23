@@ -43,7 +43,6 @@ public class MethodCallRefactoring extends Refactoring {
 				pCompilationUnit, replacement).iterator();
 		final Optional<FieldDeclaration> matchingFieldDeclarationsForReplacementType = matchingFieldDeclarationsForReplacementTypeIterator
 				.hasNext() ? Optional.of(matchingFieldDeclarationsForReplacementTypeIterator.next()) : Optional.empty();
-		// debugMatchingFields(matchingFieldDeclarations);
 
 		final List<MethodDeclaration> methodsToProcess = Navigator.findAllNodesOfGivenClass(pCompilationUnit,
 				MethodDeclaration.class);
@@ -58,10 +57,6 @@ public class MethodCallRefactoring extends Refactoring {
 		action.consumeImports(pCompilationUnit.getImports(), targetType);
 
 		return pCompilationUnit;
-	}
-
-	private void debugMatchingFields(final Set<FieldDeclaration> matchingFieldDeclarations) {
-		System.out.println("Matching FieldDeclarations: " + matchingFieldDeclarations);
 	}
 
 }
