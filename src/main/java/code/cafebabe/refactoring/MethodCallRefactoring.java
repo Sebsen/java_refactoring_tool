@@ -50,7 +50,7 @@ public class MethodCallRefactoring extends Refactoring {
 		methodsToProcess.forEach(m -> {
 			// Process every method in class from bottom to up
 			final List<Node> nodesToProcess = Lists.reverse(m.findFirst(BlockStmt.class).get().getChildNodes()).stream()
-					.filter(child -> isApplyable(child, targetType, pTypeSolver)).collect(Collectors.toList());
+					.filter(child -> action.isApplyable(child, targetType, pTypeSolver)).collect(Collectors.toList());
 
 			action.consume(nodesToProcess, matchingFieldDeclarationsForReplacementType);
 		});
@@ -64,56 +64,4 @@ public class MethodCallRefactoring extends Refactoring {
 		System.out.println("Matching FieldDeclarations: " + matchingFieldDeclarations);
 	}
 
-	@Override
-	public <T extends Node> boolean isApplyable(T pNode, String pTargetType, TypeSolver pTypeSolver) {
-		if (pNode instanceof ExpressionStmt) {
-			return isApplyable((ExpressionStmt) pNode, pTargetType, pTypeSolver);
-		}
-		return false;
-	}
-	
-	private boolean isApplyable(final ExpressionStmt pExpression, final String pTargetType,
-			final TypeSolver pTypeSolver) {
-		final Optional<MethodCallExpr> m = pExpression.findFirst(MethodCallExpr.class);
-		if (m.isPresent() && m.get().isMethodCallExpr()) {
-			final MethodCallExpr methodCall = m.get();
-
-			final MethodUsage resolvedMethodCall = JavaParserFacade.get(pTypeSolver).solveMethodAsUsage(methodCall);
-			return isDeclaringTypeTargetType(resolvedMethodCall, pTargetType)
-					|| isReturnTypeTargetType(resolvedMethodCall, pTargetType);
-
-		}
-		return false;
-	}
-
-	/**
-	 * Checks if the declaring type of this MethodCall is the same as the target
-	 * type to look for.
-	 * 
-	 * @param pResolvedMethodCall
-	 *            The resolved method call
-	 * @param pTargetType
-	 *            The target type to look for
-	 * @return true, if the declaring type for this method call is the same as
-	 *         the target type to look for otherwise false
-	 */
-	private boolean isDeclaringTypeTargetType(final MethodUsage pResolvedMethodCall, final String pTargetType) {
-		return pResolvedMethodCall.declaringType().getQualifiedName().equals(pTargetType);
-	}
-
-	/**
-	 * Checks if the return type of this MethodCall is the same as the target
-	 * type to look for.
-	 * 
-	 * @param pResolvedMethodCall
-	 *            The resolved method call
-	 * @param pTargetType
-	 *            The target type to look for
-	 * @return true, if the return type for this method call is the same as the
-	 *         target type to look for otherwise false
-	 */
-	private boolean isReturnTypeTargetType(final MethodUsage pResolvedMethodCall, final String pTargetType) {
-		return pResolvedMethodCall.returnType().isReferenceType()
-				&& pResolvedMethodCall.returnType().describe().equals(pTargetType);
-	}
 }

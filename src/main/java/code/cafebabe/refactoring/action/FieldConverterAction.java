@@ -8,6 +8,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 public final class FieldConverterAction extends Action {
 
@@ -24,6 +25,11 @@ public final class FieldConverterAction extends Action {
 
 	@Override
 	public void consumeImports(final List<ImportDeclaration> pImports, String pTargetType) {
+	}
+
+	@Override
+	public <T extends Node> boolean isApplyable(T pNode, String pTargetType, TypeSolver pMySolver) {
+		return false;
 	}
 
 }

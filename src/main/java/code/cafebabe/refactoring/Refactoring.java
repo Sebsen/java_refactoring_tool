@@ -91,9 +91,6 @@ public abstract class Refactoring {
 				.map(ImportDeclaration::getNameAsString).filter(pTargetTypeToLookFor::equals).count();
 	}
 
-	public abstract <T extends Node> boolean isApplyable(final T pNode, final String pTargetType,
-			TypeSolver pMySolver);
-
 	public abstract CompilationUnit apply(final CompilationUnit pCompilataionUnit, final TypeSolver pTypeSolver);
 
 }
