@@ -68,8 +68,10 @@ public class MethodCallRefactoring extends Refactoring {
 				// And then also add it to compilation unit itself
 				addFieldToCompilationUnit(pCompilationUnit, fieldDeclartionToAdd);
 				
+				// TODO: Create issue! Import is not added properly - x.addImport(Clazz) works fine though..!
 				pCompilationUnit.addImport(targetType, false, false);
 				
+				// TODO: Create issue sorting imports: Imports get duplicated..
 //				List<ImportDeclaration> importsToSort = new ArrayList<>(pCompilationUnit.getImports());
 //				pCompilationUnit.setImports(new NodeList<>());
 //				importsToSort.add(new ImportDeclaration(JavaParser.parseName(targetType), false, false));
@@ -110,6 +112,8 @@ public class MethodCallRefactoring extends Refactoring {
 				f.getMembers().addBefore(pFieldDeclartionToAdd, firstCallableDeclaration.get());
 			} else {
 				// Else (fallback) add as first member
+				// TODO: Create issue: When new member is added as first one
+				// intendation is not properly - as last one works though..
 				f.getMembers().addBefore(pFieldDeclartionToAdd, f.getMember(0));
 			}
 			
