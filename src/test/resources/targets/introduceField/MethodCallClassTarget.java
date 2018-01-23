@@ -5,7 +5,7 @@ import introduceField.custom.MessageLogger;
 
 public class MethodCallClass {
 	
-	private static Logger logger = MessageLogger.instance();
+	private static final Logger logger = MessageLogger.instance();
 
 	public void print() {
 		try {
