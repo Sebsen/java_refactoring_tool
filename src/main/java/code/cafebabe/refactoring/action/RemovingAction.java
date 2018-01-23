@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -28,8 +27,8 @@ public final class RemovingAction extends Action {
     }
 
     @Override
-    public void consumeImports(final List<ImportDeclaration> pImports, final Class<?> pTargetType) {
-        Set<ImportDeclaration> importsToRemove = pImports.stream().filter(i -> i != null).filter(i -> pTargetType.getName().equals(i.getNameAsString()))
+    public void consumeImports(final List<ImportDeclaration> pImports, final String pTargetType) {
+        Set<ImportDeclaration> importsToRemove = pImports.stream().filter(i -> i != null).filter(i -> pTargetType.equals(i.getNameAsString()))
                 .collect(Collectors.toSet());
         importsToRemove.forEach(ImportDeclaration::remove);
     }

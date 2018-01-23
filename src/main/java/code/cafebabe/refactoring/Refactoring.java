@@ -21,8 +21,8 @@ public abstract class Refactoring {
 	public static class RefactoringBuilder {
 
 		private Action action;
-		private Class<?> target;
-		private Class<?> replacement;
+		private String target;
+		private String replacement;
 
 		public RefactoringBuilder(final Action pAction) {
 			action = pAction;
@@ -32,8 +32,13 @@ public abstract class Refactoring {
 			return new RefactoringBuilder(pAction);
 		}
 
-		public RefactoringBuilder andTarget(final Class<?> pTarget) {
+		public RefactoringBuilder andTarget(final String pTarget) {
 			target = pTarget;
+			return this;
+		}
+
+		public RefactoringBuilder andReplacement(final String pClassToReplaceWith) {
+			replacement = pClassToReplaceWith;
 			return this;
 		}
 
@@ -44,17 +49,12 @@ public abstract class Refactoring {
 			return new MethodCallRefactoring(target, action, replacement);
 		}
 
-		public RefactoringBuilder andReplacement(final Class<?> pClassToReplaceWith) {
-			replacement = pClassToReplaceWith;
-			return this;
-		}
-
 	}
 
-	protected final Class<?> targetType;
-	protected final Class<?> replacement;
+	protected final String targetType;
+	protected final String replacement;
 
-	public Refactoring(final Class<?> pTargetType, final Class<?> pReplacement) {
+	public Refactoring(final String pTargetType, final String pReplacement) {
 		targetType = pTargetType;
 		replacement = pReplacement;
 	}
@@ -65,7 +65,7 @@ public abstract class Refactoring {
 		Navigator.findAllNodesOfGivenClass(pMethodDeclarationToProcess, VariableDeclarationExpr.class).forEach(v -> {
 			final ResolvedType resolvedVariableType = v.calculateResolvedType();
 			if (resolvedVariableType.isReferenceType()
-					&& resolvedVariableType.describe().equals(targetType.getName())) {
+					&& resolvedVariableType.describe().equals(targetType)) {
 				variableDeclarations.add(v);
 			}
 		});
@@ -73,12 +73,12 @@ public abstract class Refactoring {
 	}
 
 	protected Set<FieldDeclaration> resolveFieldDeclarations(final CompilationUnit pCompilataionUnit,
-			final Class<?> pTargetTypeToLookFor) {
+			final String pTargetTypeToLookFor) {
 		final Set<FieldDeclaration> matchingDeclarations = new LinkedHashSet<>();
 		Navigator.findAllNodesOfGivenClass(pCompilataionUnit, FieldDeclaration.class).forEach(fieldDeclaration -> {
 			final ResolvedFieldDeclaration resolvedFieldDeclaration = fieldDeclaration.resolve();
 			if (pTargetTypeToLookFor != null && resolvedFieldDeclaration.getType().isReferenceType()
-					&& resolvedFieldDeclaration.getType().describe().equals(pTargetTypeToLookFor.getName())) {
+					&& resolvedFieldDeclaration.getType().describe().equals(pTargetTypeToLookFor)) {
 				matchingDeclarations.add(fieldDeclaration);
 			}
 		});
@@ -86,12 +86,12 @@ public abstract class Refactoring {
 	}
 
 	protected boolean doImportsContainTargetType(final CompilationUnit pCompilationUnitToCheck,
-			final Class<?> pTargetTypeToLookFor) {
+			final String pTargetTypeToLookFor) {
 		return 1 == Navigator.findAllNodesOfGivenClass(pCompilationUnitToCheck, ImportDeclaration.class).stream()
-				.map(ImportDeclaration::getNameAsString).filter(pTargetTypeToLookFor.getName()::equals).count();
+				.map(ImportDeclaration::getNameAsString).filter(pTargetTypeToLookFor::equals).count();
 	}
 
-	public abstract <T extends Node> boolean isApplyable(final T pNode, final Class<?> pTargetType,
+	public abstract <T extends Node> boolean isApplyable(final T pNode, final String pTargetType,
 			TypeSolver pMySolver);
 
 	public abstract CompilationUnit apply(final CompilationUnit pCompilataionUnit, final TypeSolver pTypeSolver);

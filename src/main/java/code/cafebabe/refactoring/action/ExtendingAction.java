@@ -90,7 +90,7 @@ public final class ExtendingAction extends Action {
     }
 
     @Override
-    public void consumeImports(final List<ImportDeclaration> pImports, final Class<?> pTargetType) {
+    public void consumeImports(final List<ImportDeclaration> pImports, final String pTargetType) {
         // TODO Auto-generated method stub
 
     }

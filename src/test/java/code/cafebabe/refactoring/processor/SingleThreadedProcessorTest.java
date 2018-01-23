@@ -31,7 +31,7 @@ public class SingleThreadedProcessorTest {
 	@Test
 	public void test() throws FileNotFoundException {
 		final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new RemovingAction())
-				.andTarget(Logger.class).build();
+				.andTarget("complexClass.custom.Logger").build();
 		final String testFolderName = "complexClass/";
 		final String testFileName = "ComplexClass.java";
 		final String targetFileName = "ComplexClassAfterRemoval.java";
@@ -60,7 +60,7 @@ public class SingleThreadedProcessorTest {
 	@Test
 	public void methodCallInstanceIsConvertedToField() throws FileNotFoundException {
 		final Refactoring change = Refactoring.RefactoringBuilder.of(new RemovingAction())
-				.andTarget(Logger.class).build();
+				.andTarget("complexClass.custom.Logger").build();
 		final String testFolderName = "introduceField/";
 		final String testFileName = "MethodCallClass.java";
 		final String targetFileName = "MethodCallClassTarget.java";

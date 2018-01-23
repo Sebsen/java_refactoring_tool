@@ -23,7 +23,7 @@ public final class FieldConverterAction extends Action {
 	}
 
 	@Override
-	public void consumeImports(final List<ImportDeclaration> pImports, Class<?> pTargetType) {
+	public void consumeImports(final List<ImportDeclaration> pImports, String pTargetType) {
 	}
 
 }

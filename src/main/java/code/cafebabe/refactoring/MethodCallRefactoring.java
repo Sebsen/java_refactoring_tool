@@ -26,7 +26,7 @@ public class MethodCallRefactoring extends Refactoring {
 	private boolean trustImportStatements = true;
 	private final Action action;
 
-	MethodCallRefactoring(final Class<?> pTargetType, final Action pAction, final Class<?> pReplacement) {
+	MethodCallRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
 		super(pTargetType, pReplacement);
 		action = pAction;
 	}
@@ -65,14 +65,14 @@ public class MethodCallRefactoring extends Refactoring {
 	}
 
 	@Override
-	public <T extends Node> boolean isApplyable(T pNode, Class<?> pTargetType, TypeSolver pTypeSolver) {
+	public <T extends Node> boolean isApplyable(T pNode, String pTargetType, TypeSolver pTypeSolver) {
 		if (pNode instanceof ExpressionStmt) {
 			return isApplyable((ExpressionStmt) pNode, pTargetType, pTypeSolver);
 		}
 		return false;
 	}
 	
-	private boolean isApplyable(final ExpressionStmt pExpression, final Class<?> pTargetType,
+	private boolean isApplyable(final ExpressionStmt pExpression, final String pTargetType,
 			final TypeSolver pTypeSolver) {
 		final Optional<MethodCallExpr> m = pExpression.findFirst(MethodCallExpr.class);
 		if (m.isPresent() && m.get().isMethodCallExpr()) {
@@ -97,8 +97,8 @@ public class MethodCallRefactoring extends Refactoring {
 	 * @return true, if the declaring type for this method call is the same as
 	 *         the target type to look for otherwise false
 	 */
-	private boolean isDeclaringTypeTargetType(final MethodUsage pResolvedMethodCall, final Class<?> pTargetType) {
-		return pResolvedMethodCall.declaringType().getQualifiedName().equals(pTargetType.getName());
+	private boolean isDeclaringTypeTargetType(final MethodUsage pResolvedMethodCall, final String pTargetType) {
+		return pResolvedMethodCall.declaringType().getQualifiedName().equals(pTargetType);
 	}
 
 	/**
@@ -112,8 +112,8 @@ public class MethodCallRefactoring extends Refactoring {
 	 * @return true, if the return type for this method call is the same as the
 	 *         target type to look for otherwise false
 	 */
-	private boolean isReturnTypeTargetType(final MethodUsage pResolvedMethodCall, final Class<?> pTargetType) {
+	private boolean isReturnTypeTargetType(final MethodUsage pResolvedMethodCall, final String pTargetType) {
 		return pResolvedMethodCall.returnType().isReferenceType()
-				&& pResolvedMethodCall.returnType().describe().equals(pTargetType.getName());
+				&& pResolvedMethodCall.returnType().describe().equals(pTargetType);
 	}
 }

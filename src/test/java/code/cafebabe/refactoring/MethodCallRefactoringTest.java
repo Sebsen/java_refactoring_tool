@@ -51,7 +51,7 @@ public class MethodCallRefactoringTest {
     public void removingActionGivesExpectedResult(final String pTestFolderName, final String pTestClassName, final String pTestClassTargetName) {
 
         // Given
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new RemovingAction()).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new RemovingAction()).andTarget("complexClass.custom.Logger").build();
         final File testBase = new File(TEST_RESOURCES_BASE, pTestFolderName);
         final File target = new File(TEST_RESOURCES_TARGETS, pTestFolderName + pTestClassTargetName);
 
@@ -89,7 +89,7 @@ public class MethodCallRefactoringTest {
     public void removingActionGivesExpectedResult2() {
 
         // Given
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new RemovingAction()).andTarget(Logger.class).build();
+        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new RemovingAction()).andTarget("complexClass.custom.Logger").build();
         final String testFolderMain = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String targetFileName = "ComplexClassAfterRemoval.java";
@@ -140,7 +140,7 @@ public class MethodCallRefactoringTest {
     public void extendingActionGivesExpectedResult() {
 
         // Given
-        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new ExtendingAction()).andTarget(Logger.class).andReplacement(org.slf4j.Logger.class).build();
+        final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new ExtendingAction()).andTarget("complexClass.custom.Logger").andReplacement("org.slf4j.Logger").build();
         final String testFolderMain = "complexClass/";
         final String testFileName = "ComplexClass.java";
         final String testFileTargetName = "ComplexClassAfterExtension.java";
