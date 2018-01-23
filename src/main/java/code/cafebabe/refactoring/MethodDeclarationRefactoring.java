@@ -21,12 +21,12 @@ import com.google.common.collect.Lists;
 
 import code.cafebabe.refactoring.action.Action;
 
-public class MethodCallRefactoring extends Refactoring {
+public class MethodDeclarationRefactoring extends Refactoring {
 
 	private boolean trustImportStatements = true;
 	private final Action action;
 
-	MethodCallRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
+	MethodDeclarationRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
 		super(pTargetType, pReplacement);
 		action = pAction;
 	}

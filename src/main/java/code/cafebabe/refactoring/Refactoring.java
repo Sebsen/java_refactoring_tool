@@ -46,7 +46,7 @@ public abstract class Refactoring {
 			if (target == null) {
 				throw new IllegalStateException("No target to look for! Call \"andTarget\" first!");
 			}
-			return new MethodCallRefactoring(target, action, replacement);
+			return new MethodDeclarationRefactoring(target, action, replacement);
 		}
 
 	}
