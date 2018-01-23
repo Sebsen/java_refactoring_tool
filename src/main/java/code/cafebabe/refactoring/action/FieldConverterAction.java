@@ -3,6 +3,7 @@ package code.cafebabe.refactoring.action;
 import java.util.List;
 import java.util.Set;
 
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -16,10 +17,16 @@ public final class FieldConverterAction extends Action {
 	@Override
 	public void consume(List<Node> pNodesToProcess, Set<FieldDeclaration> matchingFieldDeclarationsForTargetType,
 			Set<FieldDeclaration> matchingFieldDeclarationsForReplacementType) {
-		if (pNodesToProcess.isEmpty()) {
-			return;
+		
+		if (!pNodesToProcess.isEmpty() && !matchingFieldDeclarationsForTargetType.isEmpty()) {
+			final FieldDeclaration matchingField = matchingFieldDeclarationsForTargetType.iterator().next();
+			
+			for (Node nodeToProcess : pNodesToProcess) {
+				MethodCallExpr convertedNode = (MethodCallExpr) nodeToProcess;
+				convertedNode.replace(JavaParser.parseExpression(matchingField.getVariable(0).getNameAsString()));
+			}
 		}
-		System.out.println(pNodesToProcess);
+		
 	}
 
 	@Override
