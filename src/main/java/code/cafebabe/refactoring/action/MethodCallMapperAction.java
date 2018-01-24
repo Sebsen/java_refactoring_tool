@@ -31,7 +31,7 @@ public class MethodCallMapperAction extends Action {
 	@Override
 	public void consume(List<Node> pNodesToProcess, Set<FieldDeclaration> matchingFieldDeclarationsForTargetType,
 			Set<FieldDeclaration> matchingFieldDeclarationsForReplacementType) {
-		// TODO Auto-generated method stub
+		System.out.println("NodesToProcess: " + pNodesToProcess);
 	}
 
 	@Override
