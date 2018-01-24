@@ -4,11 +4,11 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.CallableDeclaration;
@@ -70,7 +70,10 @@ public class MethodCallRefactoring extends Refactoring {
 
 				// TODO: Create issue! Import is not added properly -
 				// x.addImport(Clazz) works fine though..!
-				pCompilationUnit.addImport(targetType, false, false);
+				if (pCompilationUnit.getImports().stream().map(ImportDeclaration::getNameAsString)
+						.filter(importDec -> importDec.equals(targetType)).count() <= 0) {
+					pCompilationUnit.addImport(targetType, false, false);
+				}
 
 				// TODO: Create issue sorting imports: Imports get duplicated..
 				// List<ImportDeclaration> importsToSort = new
@@ -135,7 +138,8 @@ public class MethodCallRefactoring extends Refactoring {
 		String newFieldName = "javaRefactoringToolCreatedField";
 		final Set<String> desiredFieldNames = ((FieldConverterAction) action).getDesiredFieldNames();
 		// Process actions desired new field names and exclude the ones from the
-		// list, which are already declared in type - otherwise create with new random UUID!
+		// list, which are already declared in type - otherwise create with new
+		// random UUID!
 		if (classDeclaration.isPresent() && !desiredFieldNames.isEmpty()) {
 			final ClassOrInterfaceDeclaration classDec = classDeclaration.get();
 			classDec.getFields().stream().flatMap(f -> f.getVariables().stream())
