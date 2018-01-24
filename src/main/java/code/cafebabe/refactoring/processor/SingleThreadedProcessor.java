@@ -2,6 +2,7 @@ package code.cafebabe.refactoring.processor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,8 +15,15 @@ import code.cafebabe.refactoring.CompilationUnitWrapper;
 import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 import code.cafebabe.refactoring.factory.TypeSolverFactory;
+import code.cafebabe.refactoring.util.CompilationUnitWriter;
 
 public class SingleThreadedProcessor extends RefactoringProcessor {
+
+	private final boolean isDryRun;
+
+	public SingleThreadedProcessor(final boolean pIsDryRun) {
+		isDryRun = pIsDryRun;
+	}
 
 	@Override
 	protected Set<Change> processRefactorings(final CodeBase pCodeBase, final Refactoring pRefactoring) {
@@ -52,11 +60,17 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 
 	@Override
 	protected void persistChanges(final Set<Change> pChangesToPersist) {
-		// Persist changes by simply storing it into it's original source files
-		
-		// CompilationUnitWriter.writeToFile(changed, new
-		// File(cu.getSourceFile().getParent(), "out.java"));
-
+		if (!isDryRun) {
+			// Persist changes by simply storing it into it's original source
+			// files
+			for (Change change : pChangesToPersist) {
+				try {
+					CompilationUnitWriter.writeToFile(change.getTransformed(), change.getOriginal().getSourceFile());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

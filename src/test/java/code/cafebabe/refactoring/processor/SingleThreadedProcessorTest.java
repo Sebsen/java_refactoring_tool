@@ -32,6 +32,7 @@ public class SingleThreadedProcessorTest {
 
 	private static final File TEST_RESOURCES_BASE = new File("src/test/resources/");
 	private static final File TEST_RESOURCES_TARGETS = new File(TEST_RESOURCES_BASE, "targets");
+	private static final boolean DRY_RUN = true;
 
 	@Test
 	public void test() throws FileNotFoundException {
@@ -46,7 +47,7 @@ public class SingleThreadedProcessorTest {
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
 
-		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		final Set<Change> changes = new SingleThreadedProcessor(DRY_RUN).process(codeBase, change);
 
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
@@ -76,7 +77,7 @@ public class SingleThreadedProcessorTest {
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
 
-		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		final Set<Change> changes = new SingleThreadedProcessor(DRY_RUN).process(codeBase, change);
 
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
@@ -106,7 +107,7 @@ public class SingleThreadedProcessorTest {
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
 
-		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		final Set<Change> changes = new SingleThreadedProcessor(DRY_RUN).process(codeBase, change);
 
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
@@ -136,7 +137,7 @@ public class SingleThreadedProcessorTest {
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
 
-		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		final Set<Change> changes = new SingleThreadedProcessor(DRY_RUN).process(codeBase, change);
 
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
@@ -172,7 +173,7 @@ public class SingleThreadedProcessorTest {
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
 
-		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		final Set<Change> changes = new SingleThreadedProcessor(DRY_RUN).process(codeBase, change);
 
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
@@ -217,7 +218,7 @@ public class SingleThreadedProcessorTest {
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
 
-		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		final Set<Change> changes = new SingleThreadedProcessor(DRY_RUN).process(codeBase, change);
 
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
