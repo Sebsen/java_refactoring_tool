@@ -1,5 +1,6 @@
 package code.cafebabe.refactoring.action;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +14,12 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 public final class FieldConverterAction extends Action {
+
+	private final Set<String> desiredFieldNames = new LinkedHashSet<>();
+	
+	public FieldConverterAction(final List<String> pDesiredFieldNames) {
+		desiredFieldNames.addAll(pDesiredFieldNames);
+	}
 
 	@Override
 	public void consume(List<Node> pNodesToProcess, Set<FieldDeclaration> matchingFieldDeclarationsForTargetType,
@@ -60,4 +67,7 @@ public final class FieldConverterAction extends Action {
 				&& pResolvedMethodCall.returnType().describe().equals(pTargetType);
 	}
 
+	public Set<String> getDesiredFieldNames() {
+		return new LinkedHashSet<>(desiredFieldNames);
+	}
 }

@@ -1,10 +1,12 @@
 package code.cafebabe.refactoring.processor;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -59,40 +61,72 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void methodCallInstanceIsConvertedToField() throws FileNotFoundException {
-		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction())
+		final List<String> desiredFieldNames = asList("logger", "myLogger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
 				.andTarget("introduceField.custom.Logger").build();
 		final String testFolderName = "introduceField/";
 		final String testFileName = "MethodCallClass.java";
 		final String targetFileName = "MethodCallClassTarget.java";
 		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
 		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
-		
+
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
-		
+
 		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
-		
+
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
 				.map(LexicalPreservingPrinter::print).findFirst();
-		
+
 		if (!transformed.isPresent()) {
 			fail("Missing transformed file: \"" + targetFileName + "\"!");
 		}
-		
+
 		assertEquals(
 				LexicalPreservingPrinter
-				.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
 				transformed.get());
 	}
 
 	@Test
 	public void methodCallInstanceIsConvertedToFieldWithDesiredName() throws FileNotFoundException {
-		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction())
+		final List<String> desiredFieldNames = asList("logger", "myLogger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
 				.andTarget("introduceField.custom.Logger").build();
 		final String testFolderName = "introduceFieldExistingFieldWithSameName/";
 		final String testFileName = "MethodCallClass.java";
 		final String targetFileName = "MethodCallClassTarget.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
+	@Test
+	public void methodCallInstanceIsConvertedToFieldWithDefaultName() throws FileNotFoundException {
+		final List<String> desiredFieldNames = asList("logger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "introduceFieldExistingFieldWithSameName/";
+		final String testFileName = "MethodCallClass.java";
+		final String targetFileName = "MethodCallClassTargetDefault.java";
 		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
 		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
 		

@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.JavaParser;
@@ -21,6 +22,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import code.cafebabe.refactoring.action.Action;
+import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public class MethodCallRefactoring extends Refactoring {
 
@@ -57,7 +59,7 @@ public class MethodCallRefactoring extends Refactoring {
 				// manually add one!
 				final FieldDeclaration fieldDeclartionToAdd = new FieldDeclaration(
 						EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
-						createVariableDeclaration(nodesToProcess));
+						createVariableDeclaration(pCompilationUnit, nodesToProcess));
 
 				// Add field to list of 'retrieved' fields of desired type from
 				// processed file
@@ -124,10 +126,29 @@ public class MethodCallRefactoring extends Refactoring {
 		});
 	}
 
-	private VariableDeclarator createVariableDeclaration(final List<Node> nodesToProcess) {
+	private VariableDeclarator createVariableDeclaration(final CompilationUnit pCompilationUnit,
+			final List<Node> nodesToProcess) {
+
+		final Optional<ClassOrInterfaceDeclaration> classDeclaration = pCompilationUnit
+				.findFirst(ClassOrInterfaceDeclaration.class);
+
+		String newFieldName = "javaRefactoringToolCreatedField";
+		final Set<String> desiredFieldNames = ((FieldConverterAction) action).getDesiredFieldNames();
+		// Process actions desired new field names and exclude the ones from the
+		// list, which are already declared in type - otherwise create with new random UUID!
+		if (classDeclaration.isPresent() && !desiredFieldNames.isEmpty()) {
+			final ClassOrInterfaceDeclaration classDec = classDeclaration.get();
+			classDec.getFields().stream().flatMap(f -> f.getVariables().stream())
+					.map(VariableDeclarator::getNameAsString).filter(desiredFieldNames::contains)
+					.forEach(desiredFieldNames::remove);
+			if (!desiredFieldNames.isEmpty()) {
+				newFieldName = desiredFieldNames.iterator().next();
+			}
+		}
+
 		// Create variable/ field initializer expression out of target
 		// MethodCallExpr which shall be replaced
-		return new VariableDeclarator(convertTargetTypeToType(), "logger",
+		return new VariableDeclarator(convertTargetTypeToType(), newFieldName,
 				(MethodCallExpr) nodesToProcess.get(0).clone());
 	}
 
