@@ -198,9 +198,14 @@ public class SingleThreadedProcessorTest {
 	public void methodCallsAreMappedToSpecifiedOtherMethodCalls() throws FileNotFoundException {
 		final Map<String, String> desiredMapping = new HashMap<>();
 		desiredMapping.put("logAsInternalException", "error");
-		
-		final Refactoring change = Refactoring.RefactoringBuilder.of(new MethodCallMapperAction(desiredMapping))
-				.andTarget("introduceField.custom.Logger").build();
+
+		final Map<String, String> importMapping = new HashMap<>();
+		importMapping.put("introduceField.custom.Logger", "org.slf4j.Logger");
+		importMapping.put("introduceField.custom.MessageLogger", "org.slf4j.LoggerFactory");
+
+		final Refactoring change = Refactoring.RefactoringBuilder
+				.of(new MethodCallMapperAction(desiredMapping, importMapping)).andTarget("introduceField.custom.Logger")
+				.build();
 		final String testFolderName = "mapMethodCalls/";
 		final String testFileName = "MappedMethodCallClass.java";
 		final String targetFileName = "MappedMethodCallClassTarget.java";
