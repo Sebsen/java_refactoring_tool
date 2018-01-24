@@ -86,4 +86,33 @@ public class SingleThreadedProcessorTest {
 				transformed.get());
 	}
 
+	@Test
+	public void methodCallInstanceIsConvertedToFieldWithDesiredName() throws FileNotFoundException {
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction())
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "introduceFieldExistingFieldWithSameName/";
+		final String testFileName = "MethodCallClass.java";
+		final String targetFileName = "MethodCallClassTarget.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+		
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+		
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+		
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+		
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+		
+		assertEquals(
+				LexicalPreservingPrinter
+				.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
 }
