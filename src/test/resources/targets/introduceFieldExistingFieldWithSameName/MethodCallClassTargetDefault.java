@@ -5,13 +5,15 @@ import introduceField.custom.MessageLogger;
 
 public class MethodCallClass {
 	
-	private static final Logger logger = MessageLogger.instance();
+	private static final StringBuilder logger = new StringBuilder();
+	
+	private static final Logger JavaRefactoringToolCreatedField = MessageLogger.instance();
 
 	public void print() {
 		try {
 			throw new FileNotFoundException();
 		} catch (FileNotFoundException e) {
-			logger.logAsInternalException(e);
+			JavaRefactoringToolCreatedField.logAsInternalException(e);
 		}
 	}
 	

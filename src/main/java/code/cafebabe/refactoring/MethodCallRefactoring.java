@@ -1,29 +1,32 @@
 package code.cafebabe.refactoring;
 
-import java.util.Iterator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.resolution.MethodUsage;
-import com.github.javaparser.symbolsolver.javaparser.Navigator;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
-import com.google.common.collect.Lists;
 
 import code.cafebabe.refactoring.action.Action;
+import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public class MethodCallRefactoring extends Refactoring {
 
-	private boolean trustImportStatements = true;
+	private boolean trustImportStatements = false;
 	private final Action action;
 
 	MethodCallRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
@@ -39,20 +42,56 @@ public class MethodCallRefactoring extends Refactoring {
 
 		final Set<FieldDeclaration> matchingFieldDeclarationsForTargetType = resolveFieldDeclarations(pCompilationUnit,
 				targetType);
-		final Iterator<FieldDeclaration> matchingFieldDeclarationsForReplacementTypeIterator = resolveFieldDeclarations(
-				pCompilationUnit, replacement).iterator();
-		final Optional<FieldDeclaration> matchingFieldDeclarationsForReplacementType = matchingFieldDeclarationsForReplacementTypeIterator
-				.hasNext() ? Optional.of(matchingFieldDeclarationsForReplacementTypeIterator.next()) : Optional.empty();
-		// debugMatchingFields(matchingFieldDeclarations);
 
-		final List<MethodDeclaration> methodsToProcess = Navigator.findAllNodesOfGivenClass(pCompilationUnit,
-				MethodDeclaration.class);
+		final Set<FieldDeclaration> matchingFieldDeclarationsForReplacementType = resolveFieldDeclarations(
+				pCompilationUnit, replacement);
+
+		final List<MethodDeclaration> methodsToProcess = pCompilationUnit.findAll(MethodDeclaration.class);
+
+		// Process each method individually
 		methodsToProcess.forEach(m -> {
-			// Process every method in class from bottom to up
-			final List<Node> nodesToProcess = Lists.reverse(m.findFirst(BlockStmt.class).get().getChildNodes()).stream()
-					.filter(child -> isApplyable(child, targetType, pTypeSolver)).collect(Collectors.toList());
+			final List<Node> nodesToProcess = m.findFirst(BlockStmt.class).get().findAll(MethodCallExpr.class).stream()
+					.filter(child -> action.isApplyable(child, targetType, pTypeSolver)).collect(Collectors.toList());
 
-			action.consume(nodesToProcess, matchingFieldDeclarationsForReplacementType);
+			if (matchingFieldDeclarationsForTargetType.isEmpty() && !nodesToProcess.isEmpty()) {
+				// Since we want to convert method calls to field access (but
+				// any field of desired type is present in processed type)
+				// manually add one!
+				final FieldDeclaration fieldDeclartionToAdd = new FieldDeclaration(
+						EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
+						createVariableDeclaration(pCompilationUnit, nodesToProcess));
+
+				// Add field to list of 'retrieved' fields of desired type from
+				// processed file
+				matchingFieldDeclarationsForTargetType.add(fieldDeclartionToAdd);
+
+				// And then also add it to compilation unit itself
+				addFieldToCompilationUnit(pCompilationUnit, fieldDeclartionToAdd);
+
+				// TODO: Create issue! Import is not added properly -
+				// x.addImport(Clazz) works fine though..!
+				if (pCompilationUnit.getImports().stream().map(ImportDeclaration::getNameAsString)
+						.filter(importDec -> importDec.equals(targetType)).count() <= 0) {
+					pCompilationUnit.addImport(targetType, false, false);
+				}
+
+				// TODO: Create issue sorting imports: Imports get duplicated..
+				// List<ImportDeclaration> importsToSort = new
+				// ArrayList<>(pCompilationUnit.getImports());
+				// pCompilationUnit.setImports(new NodeList<>());
+				// importsToSort.add(new
+				// ImportDeclaration(JavaParser.parseName(targetType), false,
+				// false));
+
+				// importsToSort.sort((i1, i2) ->
+				// i1.getNameAsString().compareTo(i2.getNameAsString()));
+				// pCompilationUnit.setImports(new NodeList<>(importsToSort));
+
+			}
+
+			// Let action consume retrieved nodes and do it's job
+			action.consume(nodesToProcess, matchingFieldDeclarationsForTargetType,
+					matchingFieldDeclarationsForReplacementType);
 		});
 		action.consumeFieldDeclarations(matchingFieldDeclarationsForTargetType);
 		action.consumeImports(pCompilationUnit.getImports(), targetType);
@@ -60,60 +99,66 @@ public class MethodCallRefactoring extends Refactoring {
 		return pCompilationUnit;
 	}
 
-	private void debugMatchingFields(final Set<FieldDeclaration> matchingFieldDeclarations) {
-		System.out.println("Matching FieldDeclarations: " + matchingFieldDeclarations);
-	}
-
-	@Override
-	public <T extends Node> boolean isApplyable(T pNode, String pTargetType, TypeSolver pTypeSolver) {
-		if (pNode instanceof ExpressionStmt) {
-			return isApplyable((ExpressionStmt) pNode, pTargetType, pTypeSolver);
-		}
-		return false;
-	}
-	
-	private boolean isApplyable(final ExpressionStmt pExpression, final String pTargetType,
-			final TypeSolver pTypeSolver) {
-		final Optional<MethodCallExpr> m = pExpression.findFirst(MethodCallExpr.class);
-		if (m.isPresent() && m.get().isMethodCallExpr()) {
-			final MethodCallExpr methodCall = m.get();
-
-			final MethodUsage resolvedMethodCall = JavaParserFacade.get(pTypeSolver).solveMethodAsUsage(methodCall);
-			return isDeclaringTypeTargetType(resolvedMethodCall, pTargetType)
-					|| isReturnTypeTargetType(resolvedMethodCall, pTargetType);
-
-		}
-		return false;
-	}
-
 	/**
-	 * Checks if the declaring type of this MethodCall is the same as the target
-	 * type to look for.
+	 * Adds a given field declaration as first member before any
+	 * CallableDeclaration (eg ConstructorDeclaration or MethodDeclaration)
 	 * 
-	 * @param pResolvedMethodCall
-	 *            The resolved method call
-	 * @param pTargetType
-	 *            The target type to look for
-	 * @return true, if the declaring type for this method call is the same as
-	 *         the target type to look for otherwise false
+	 * @param pCompilationUnit
+	 *            The compilation unit to add the field to
+	 * @param pFieldDeclartionToAdd
+	 *            The field declaration to add to the compilation unit
+	 * @param nodesToProcess
 	 */
-	private boolean isDeclaringTypeTargetType(final MethodUsage pResolvedMethodCall, final String pTargetType) {
-		return pResolvedMethodCall.declaringType().getQualifiedName().equals(pTargetType);
+	private void addFieldToCompilationUnit(final CompilationUnit pCompilationUnit,
+			final FieldDeclaration pFieldDeclartionToAdd) {
+		final Optional<ClassOrInterfaceDeclaration> classDeclaration = pCompilationUnit
+				.findFirst(ClassOrInterfaceDeclaration.class);
+		classDeclaration.ifPresent(f -> {
+			Optional<CallableDeclaration> firstCallableDeclaration = f.findFirst(CallableDeclaration.class);
+
+			if (firstCallableDeclaration.isPresent()) {
+				// If any callable declaration is present - add before
+				f.getMembers().addBefore(pFieldDeclartionToAdd, firstCallableDeclaration.get());
+			} else {
+				// Else (fallback) add as first member
+				// TODO: Create issue: When new member is added as first one
+				// intendation is not properly - as last one works though..
+				f.getMembers().addBefore(pFieldDeclartionToAdd, f.getMember(0));
+			}
+
+		});
 	}
 
-	/**
-	 * Checks if the return type of this MethodCall is the same as the target
-	 * type to look for.
-	 * 
-	 * @param pResolvedMethodCall
-	 *            The resolved method call
-	 * @param pTargetType
-	 *            The target type to look for
-	 * @return true, if the return type for this method call is the same as the
-	 *         target type to look for otherwise false
-	 */
-	private boolean isReturnTypeTargetType(final MethodUsage pResolvedMethodCall, final String pTargetType) {
-		return pResolvedMethodCall.returnType().isReferenceType()
-				&& pResolvedMethodCall.returnType().describe().equals(pTargetType);
+	private VariableDeclarator createVariableDeclaration(final CompilationUnit pCompilationUnit,
+			final List<Node> nodesToProcess) {
+
+		final Optional<ClassOrInterfaceDeclaration> classDeclaration = pCompilationUnit
+				.findFirst(ClassOrInterfaceDeclaration.class);
+
+		String newFieldName = "javaRefactoringToolCreatedField";
+		final Set<String> desiredFieldNames = ((FieldConverterAction) action).getDesiredFieldNames();
+		// Process actions desired new field names and exclude the ones from the
+		// list, which are already declared in type - otherwise create with new
+		// random UUID!
+		if (classDeclaration.isPresent() && !desiredFieldNames.isEmpty()) {
+			final ClassOrInterfaceDeclaration classDec = classDeclaration.get();
+			classDec.getFields().stream().flatMap(f -> f.getVariables().stream())
+					.map(VariableDeclarator::getNameAsString).filter(desiredFieldNames::contains)
+					.forEach(desiredFieldNames::remove);
+			if (!desiredFieldNames.isEmpty()) {
+				newFieldName = desiredFieldNames.iterator().next();
+			}
+		}
+
+		// Create variable/ field initializer expression out of target
+		// MethodCallExpr which shall be replaced
+		return new VariableDeclarator(convertTargetTypeToType(), newFieldName,
+				(MethodCallExpr) nodesToProcess.get(0).clone());
 	}
+
+	private ClassOrInterfaceType convertTargetTypeToType() {
+		return JavaParser
+				.parseClassOrInterfaceType(targetType.substring(targetType.lastIndexOf('.') + 1, targetType.length()));
+	}
+
 }

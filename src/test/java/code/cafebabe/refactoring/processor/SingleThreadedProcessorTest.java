@@ -1,10 +1,12 @@
 package code.cafebabe.refactoring.processor;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,11 +18,11 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 
 import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
-import code.cafebabe.refactoring.MethodCallRefactoring;
+import code.cafebabe.refactoring.MethodDeclarationRefactoring;
 import code.cafebabe.refactoring.Refactoring;
+import code.cafebabe.refactoring.action.FieldConverterAction;
 import code.cafebabe.refactoring.action.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
-import complexClass.custom.Logger;
 
 @RunWith(JUnitPlatform.class)
 public class SingleThreadedProcessorTest {
@@ -30,7 +32,7 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void test() throws FileNotFoundException {
-		final Refactoring change = MethodCallRefactoring.RefactoringBuilder.of(new RemovingAction())
+		final Refactoring change = MethodDeclarationRefactoring.RefactoringBuilder.of(new RemovingAction())
 				.andTarget("complexClass.custom.Logger").build();
 		final String testFolderName = "complexClass/";
 		final String testFileName = "ComplexClass.java";
@@ -59,30 +61,127 @@ public class SingleThreadedProcessorTest {
 
 	@Test
 	public void methodCallInstanceIsConvertedToField() throws FileNotFoundException {
-		final Refactoring change = Refactoring.RefactoringBuilder.of(new RemovingAction())
-				.andTarget("complexClass.custom.Logger").build();
+		final List<String> desiredFieldNames = asList("logger", "myLogger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
+				.andTarget("introduceField.custom.Logger").build();
 		final String testFolderName = "introduceField/";
 		final String testFileName = "MethodCallClass.java";
 		final String targetFileName = "MethodCallClassTarget.java";
 		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
 		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
-		
+
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
-		
+
 		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
-		
+
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
 				.map(LexicalPreservingPrinter::print).findFirst();
-		
+
 		if (!transformed.isPresent()) {
 			fail("Missing transformed file: \"" + targetFileName + "\"!");
 		}
-		
+
 		assertEquals(
 				LexicalPreservingPrinter
-				.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
+	@Test
+	public void methodCallInstanceIsConvertedToFieldWithDesiredName() throws FileNotFoundException {
+		final List<String> desiredFieldNames = asList("logger", "myLogger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "introduceFieldExistingFieldWithSameName/";
+		final String testFileName = "MethodCallClass.java";
+		final String targetFileName = "MethodCallClassTarget.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
+	@Test
+	public void methodCallInstanceIsConvertedToFieldWithDefaultName() throws FileNotFoundException {
+		final List<String> desiredFieldNames = asList("logger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "introduceFieldExistingFieldWithSameName/";
+		final String testFileName = "MethodCallClass.java";
+		final String targetFileName = "MethodCallClassTargetDefault.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
+	/**
+	 * This test case assures, that an existing field of 'target type' in
+	 * processed class is reused instead of having a new one created
+	 * 
+	 * @throws FileNotFoundException
+	 */
+	@Test
+	public void methodCallInstanceIsConvertedToExistingField() throws FileNotFoundException {
+		final List<String> desiredFieldNames = asList("myLogger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "reuseField/";
+		final String testFileName = "MethodCallClass.java";
+		final String targetFileName = "MethodCallClassTarget.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
 				transformed.get());
 	}
 

@@ -11,7 +11,7 @@ public class MethodCallClass {
 		try {
 			throw new FileNotFoundException();
 		} catch (FileNotFoundException e) {
-			logger.logAsInternalException(e);
+			MessageLogger.instance().logAsInternalException(e);
 		}
 	}
 	

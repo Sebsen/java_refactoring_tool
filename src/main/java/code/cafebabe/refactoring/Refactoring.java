@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
@@ -15,6 +14,7 @@ import com.github.javaparser.symbolsolver.javaparser.Navigator;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import code.cafebabe.refactoring.action.Action;
+import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public abstract class Refactoring {
 
@@ -46,7 +46,10 @@ public abstract class Refactoring {
 			if (target == null) {
 				throw new IllegalStateException("No target to look for! Call \"andTarget\" first!");
 			}
-			return new MethodCallRefactoring(target, action, replacement);
+			if (action instanceof FieldConverterAction) {
+				return new MethodCallRefactoring(target, action, replacement);
+			}
+			return new MethodDeclarationRefactoring(target, action, replacement);
 		}
 
 	}
@@ -90,9 +93,6 @@ public abstract class Refactoring {
 		return 1 == Navigator.findAllNodesOfGivenClass(pCompilationUnitToCheck, ImportDeclaration.class).stream()
 				.map(ImportDeclaration::getNameAsString).filter(pTargetTypeToLookFor::equals).count();
 	}
-
-	public abstract <T extends Node> boolean isApplyable(final T pNode, final String pTargetType,
-			TypeSolver pMySolver);
 
 	public abstract CompilationUnit apply(final CompilationUnit pCompilataionUnit, final TypeSolver pTypeSolver);
 
