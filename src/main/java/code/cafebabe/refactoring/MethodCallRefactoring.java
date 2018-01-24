@@ -50,48 +50,57 @@ public class MethodCallRefactoring extends Refactoring {
 
 		// Process each method individually
 		methodsToProcess.forEach(m -> {
-			final List<Node> nodesToProcess = m.findFirst(BlockStmt.class).get().findAll(MethodCallExpr.class).stream()
-					.filter(child -> action.isApplyable(child, targetType, pTypeSolver)).collect(Collectors.toList());
+			final Optional<BlockStmt> firstBlockStmt = m.findFirst(BlockStmt.class);
+			if (firstBlockStmt.isPresent()) {
+				final List<Node> nodesToProcess = firstBlockStmt.get().findAll(MethodCallExpr.class).stream()
+						.filter(child -> action.isApplyable(child, targetType, pTypeSolver))
+						.collect(Collectors.toList());
 
-			if (matchingFieldDeclarationsForTargetType.isEmpty() && !nodesToProcess.isEmpty()) {
-				// Since we want to convert method calls to field access (but
-				// any field of desired type is present in processed type)
-				// manually add one!
-				final FieldDeclaration fieldDeclartionToAdd = new FieldDeclaration(
-						EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
-						createVariableDeclaration(pCompilationUnit, nodesToProcess));
+				if (matchingFieldDeclarationsForTargetType.isEmpty() && !nodesToProcess.isEmpty()) {
+					// Since we want to convert method calls to field access
+					// (but
+					// any field of desired type is present in processed type)
+					// manually add one!
+					final FieldDeclaration fieldDeclartionToAdd = new FieldDeclaration(
+							EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
+							createVariableDeclaration(pCompilationUnit, nodesToProcess));
 
-				// Add field to list of 'retrieved' fields of desired type from
-				// processed file
-				matchingFieldDeclarationsForTargetType.add(fieldDeclartionToAdd);
+					// Add field to list of 'retrieved' fields of desired type
+					// from
+					// processed file
+					matchingFieldDeclarationsForTargetType.add(fieldDeclartionToAdd);
 
-				// And then also add it to compilation unit itself
-				addFieldToCompilationUnit(pCompilationUnit, fieldDeclartionToAdd);
+					// And then also add it to compilation unit itself
+					addFieldToCompilationUnit(pCompilationUnit, fieldDeclartionToAdd);
 
-				// TODO: Create issue! Import is not added properly -
-				// x.addImport(Clazz) works fine though..!
-				if (pCompilationUnit.getImports().stream().map(ImportDeclaration::getNameAsString)
-						.filter(importDec -> importDec.equals(targetType)).count() <= 0) {
-					pCompilationUnit.addImport(targetType, false, false);
+					// TODO: Create issue! Import is not added properly -
+					// x.addImport(Clazz) works fine though..!
+					if (pCompilationUnit.getImports().stream().map(ImportDeclaration::getNameAsString)
+							.filter(importDec -> importDec.equals(targetType)).count() <= 0) {
+						pCompilationUnit.addImport(targetType, false, false);
+					}
+
+					// TODO: Create issue sorting imports: Imports get
+					// duplicated..
+					// List<ImportDeclaration> importsToSort = new
+					// ArrayList<>(pCompilationUnit.getImports());
+					// pCompilationUnit.setImports(new NodeList<>());
+					// importsToSort.add(new
+					// ImportDeclaration(JavaParser.parseName(targetType),
+					// false,
+					// false));
+
+					// importsToSort.sort((i1, i2) ->
+					// i1.getNameAsString().compareTo(i2.getNameAsString()));
+					// pCompilationUnit.setImports(new
+					// NodeList<>(importsToSort));
+
 				}
 
-				// TODO: Create issue sorting imports: Imports get duplicated..
-				// List<ImportDeclaration> importsToSort = new
-				// ArrayList<>(pCompilationUnit.getImports());
-				// pCompilationUnit.setImports(new NodeList<>());
-				// importsToSort.add(new
-				// ImportDeclaration(JavaParser.parseName(targetType), false,
-				// false));
-
-				// importsToSort.sort((i1, i2) ->
-				// i1.getNameAsString().compareTo(i2.getNameAsString()));
-				// pCompilationUnit.setImports(new NodeList<>(importsToSort));
-
+				// Let action consume retrieved nodes and do it's job
+				action.consume(nodesToProcess, matchingFieldDeclarationsForTargetType,
+						matchingFieldDeclarationsForReplacementType);
 			}
-
-			// Let action consume retrieved nodes and do it's job
-			action.consume(nodesToProcess, matchingFieldDeclarationsForTargetType,
-					matchingFieldDeclarationsForReplacementType);
 		});
 		action.consumeFieldDeclarations(matchingFieldDeclarationsForTargetType);
 		action.consumeImports(pCompilationUnit.getImports(), targetType);
