@@ -1,6 +1,5 @@
 package code.cafebabe.refactoring;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -9,10 +8,8 @@ import java.util.stream.Collectors;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -59,7 +56,8 @@ public class MethodCallRefactoring extends Refactoring {
 				// any field of desired type is present in processed type)
 				// manually add one!
 				final FieldDeclaration fieldDeclartionToAdd = new FieldDeclaration(
-						EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL), createVariableDeclaration(nodesToProcess));
+						EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
+						createVariableDeclaration(nodesToProcess));
 
 				// Add field to list of 'retrieved' fields of desired type from
 				// processed file
@@ -67,22 +65,28 @@ public class MethodCallRefactoring extends Refactoring {
 
 				// And then also add it to compilation unit itself
 				addFieldToCompilationUnit(pCompilationUnit, fieldDeclartionToAdd);
-				
-				// TODO: Create issue! Import is not added properly - x.addImport(Clazz) works fine though..!
-				pCompilationUnit.addImport(targetType, false, false);
-				
-				// TODO: Create issue sorting imports: Imports get duplicated..
-//				List<ImportDeclaration> importsToSort = new ArrayList<>(pCompilationUnit.getImports());
-//				pCompilationUnit.setImports(new NodeList<>());
-//				importsToSort.add(new ImportDeclaration(JavaParser.parseName(targetType), false, false));
-				
-//				importsToSort.sort((i1, i2) -> i1.getNameAsString().compareTo(i2.getNameAsString()));
-//				pCompilationUnit.setImports(new NodeList<>(importsToSort));
 
-				// Let action consume retrieved nodes and do it's job
-				action.consume(nodesToProcess, matchingFieldDeclarationsForTargetType,
-						matchingFieldDeclarationsForReplacementType);
+				// TODO: Create issue! Import is not added properly -
+				// x.addImport(Clazz) works fine though..!
+				pCompilationUnit.addImport(targetType, false, false);
+
+				// TODO: Create issue sorting imports: Imports get duplicated..
+				// List<ImportDeclaration> importsToSort = new
+				// ArrayList<>(pCompilationUnit.getImports());
+				// pCompilationUnit.setImports(new NodeList<>());
+				// importsToSort.add(new
+				// ImportDeclaration(JavaParser.parseName(targetType), false,
+				// false));
+
+				// importsToSort.sort((i1, i2) ->
+				// i1.getNameAsString().compareTo(i2.getNameAsString()));
+				// pCompilationUnit.setImports(new NodeList<>(importsToSort));
+
 			}
+
+			// Let action consume retrieved nodes and do it's job
+			action.consume(nodesToProcess, matchingFieldDeclarationsForTargetType,
+					matchingFieldDeclarationsForReplacementType);
 		});
 		action.consumeFieldDeclarations(matchingFieldDeclarationsForTargetType);
 		action.consumeImports(pCompilationUnit.getImports(), targetType);
@@ -116,12 +120,13 @@ public class MethodCallRefactoring extends Refactoring {
 				// intendation is not properly - as last one works though..
 				f.getMembers().addBefore(pFieldDeclartionToAdd, f.getMember(0));
 			}
-			
+
 		});
 	}
 
 	private VariableDeclarator createVariableDeclaration(final List<Node> nodesToProcess) {
-		// Create variable/ field initializer expression out of target MethodCallExpr which shall be replaced
+		// Create variable/ field initializer expression out of target
+		// MethodCallExpr which shall be replaced
 		return new VariableDeclarator(convertTargetTypeToType(), "logger",
 				(MethodCallExpr) nodesToProcess.get(0).clone());
 	}
