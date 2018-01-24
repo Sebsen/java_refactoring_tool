@@ -6,7 +6,9 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +23,7 @@ import code.cafebabe.refactoring.CodeBase;
 import code.cafebabe.refactoring.MethodDeclarationRefactoring;
 import code.cafebabe.refactoring.Refactoring;
 import code.cafebabe.refactoring.action.FieldConverterAction;
+import code.cafebabe.refactoring.action.MethodCallMapperAction;
 import code.cafebabe.refactoring.action.RemovingAction;
 import code.cafebabe.refactoring.factory.CompilationUnitFactory;
 
@@ -163,6 +166,44 @@ public class SingleThreadedProcessorTest {
 		final String testFolderName = "reuseField/";
 		final String testFileName = "MethodCallClass.java";
 		final String targetFileName = "MethodCallClassTarget.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
+	/**
+	 * This test case assures, that specific method calls on given target type
+	 * will be replaced by calls to another method
+	 * 
+	 * @throws FileNotFoundException
+	 */
+	@Test
+	public void methodCallsAreMappedToSpecifiedOtherMethodCalls() throws FileNotFoundException {
+		final Map<String, String> desiredMapping = new HashMap<>();
+		desiredMapping.put("logAsInternalException", "error");
+		
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new MethodCallMapperAction(desiredMapping))
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "mapMethodCalls/";
+		final String testFileName = "MappedMethodCallClass.java";
+		final String targetFileName = "MappedMethodCallClassTarget.java";
 		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
 		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
 
