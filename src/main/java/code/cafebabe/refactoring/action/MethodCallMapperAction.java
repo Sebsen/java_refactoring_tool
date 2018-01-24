@@ -47,6 +47,9 @@ public class MethodCallMapperAction extends Action {
 
 	@Override
 	public void consumeFieldDeclarations(final Set<FieldDeclaration> pFieldDeclarations) {
+		if (newFieldInitializerExpression.isEmpty()) {
+			return;
+		}
 		for (final FieldDeclaration fieldDeclaration : pFieldDeclarations) {
 			for (VariableDeclarator variableDeclarator : fieldDeclaration.getVariables()) {
 				// Replace old VariableInitializerExpression by new provided one
