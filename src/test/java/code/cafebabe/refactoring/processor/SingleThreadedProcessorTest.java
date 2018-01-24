@@ -129,23 +129,59 @@ public class SingleThreadedProcessorTest {
 		final String targetFileName = "MethodCallClassTargetDefault.java";
 		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
 		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
-		
+
 		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
 				.build();
-		
+
 		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
-		
+
 		final Optional<String> transformed = changes.stream()
 				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
 				.map(LexicalPreservingPrinter::print).findFirst();
-		
+
 		if (!transformed.isPresent()) {
 			fail("Missing transformed file: \"" + targetFileName + "\"!");
 		}
-		
+
 		assertEquals(
 				LexicalPreservingPrinter
-				.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
+				transformed.get());
+	}
+
+	/**
+	 * This test case assures, that an existing field of 'target type' in
+	 * processed class is reused instead of having a new one created
+	 * 
+	 * @throws FileNotFoundException
+	 */
+	@Test
+	public void methodCallInstanceIsConvertedToExistingField() throws FileNotFoundException {
+		final List<String> desiredFieldNames = asList("myLogger");
+		final Refactoring change = Refactoring.RefactoringBuilder.of(new FieldConverterAction(desiredFieldNames))
+				.andTarget("introduceField.custom.Logger").build();
+		final String testFolderName = "reuseField/";
+		final String testFileName = "MethodCallClass.java";
+		final String targetFileName = "MethodCallClassTarget.java";
+		final File testBase = new File(TEST_RESOURCES_BASE, testFolderName);
+		final File target = new File(TEST_RESOURCES_TARGETS, testFolderName + targetFileName);
+
+		final CodeBase codeBase = CodeBase.CodeBaseBuilder.fromRoots(testBase).addJarRoot("lib/slf4j-api-1.7.25.jar")
+				.build();
+
+		final Set<Change> changes = new SingleThreadedProcessor().process(codeBase, change);
+
+		final Optional<String> transformed = changes.stream()
+				.filter(c -> testFileName.equals(c.getOriginal().getSourceFile().getName())).map(Change::getTransformed)
+				.map(LexicalPreservingPrinter::print).findFirst();
+
+		if (!transformed.isPresent()) {
+			fail("Missing transformed file: \"" + targetFileName + "\"!");
+		}
+
+		assertEquals(
+				LexicalPreservingPrinter
+						.print(CompilationUnitFactory.createPreservingCompilationUnit(target).getCompilationUnit()),
 				transformed.get());
 	}
 
