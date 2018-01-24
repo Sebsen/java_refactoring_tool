@@ -10,12 +10,9 @@ import java.util.stream.Collectors;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
@@ -24,10 +21,13 @@ public class MethodCallMapperAction extends Action {
 
 	private HashMap<String, String> methodCallMapping = new HashMap<>();
 	private HashMap<String, String> importMappings = new HashMap<>();
+	private final String newFieldInitializerExpression;
 
-	public MethodCallMapperAction(final Map<String, String> pDesiredMapping, Map<String, String> pImportMapping) {
+	public MethodCallMapperAction(final Map<String, String> pDesiredMapping, Map<String, String> pImportMapping,
+			final String pNewFieldInitializerExpression) {
 		methodCallMapping.putAll(pDesiredMapping);
 		importMappings.putAll(pImportMapping);
+		newFieldInitializerExpression = pNewFieldInitializerExpression;
 	}
 
 	@Override
@@ -49,14 +49,10 @@ public class MethodCallMapperAction extends Action {
 	public void consumeFieldDeclarations(final Set<FieldDeclaration> pFieldDeclarations) {
 		for (final FieldDeclaration fieldDeclaration : pFieldDeclarations) {
 			for (VariableDeclarator variableDeclarator : fieldDeclaration.getVariables()) {
-				variableDeclarator.getInitializer().ifPresent(i -> {
-					SimpleName parsedSimpleName = JavaParser.parseSimpleName("getLogger");
-					Expression parsedExpression = JavaParser.parseExpression("LoggerFactory");
-					MethodCallExpr newInitializer = new MethodCallExpr(parsedExpression, parsedSimpleName);
-					newInitializer.addArgument(i.findCompilationUnit().get()
-							.findFirst(ClassOrInterfaceDeclaration.class).get().getNameAsString() + ".class");
-					i.replace(newInitializer);
-				});
+				// Replace old VariableInitializerExpression by new provided one
+				// (for matching fields of target type)
+				variableDeclarator.getInitializer()
+						.ifPresent(i -> i.replace(JavaParser.parseExpression(newFieldInitializerExpression)));
 			}
 		}
 	}

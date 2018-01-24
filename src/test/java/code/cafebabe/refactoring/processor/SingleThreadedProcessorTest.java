@@ -202,9 +202,11 @@ public class SingleThreadedProcessorTest {
 		final Map<String, String> importMapping = new HashMap<>();
 		importMapping.put("introduceField.custom.Logger", "org.slf4j.Logger");
 		importMapping.put("introduceField.custom.MessageLogger", "org.slf4j.LoggerFactory");
+		
+		final String newFieldInitializerExpression = "LoggerFactory.getLogger(MappedMethodCallClass.class)";
 
 		final Refactoring change = Refactoring.RefactoringBuilder
-				.of(new MethodCallMapperAction(desiredMapping, importMapping)).andTarget("introduceField.custom.Logger")
+				.of(new MethodCallMapperAction(desiredMapping, importMapping, newFieldInitializerExpression)).andTarget("introduceField.custom.Logger")
 				.build();
 		final String testFolderName = "mapMethodCalls/";
 		final String testFileName = "MappedMethodCallClass.java";
