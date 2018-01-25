@@ -4,12 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.validator.Java6Validator;
+import com.github.javaparser.ast.validator.Java7Validator;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
-import com.github.javaparser.utils.Pair;
 
 import code.cafebabe.refactoring.CompilationUnitWrapper;
 
@@ -26,7 +24,7 @@ public class CompilationUnitFactory {
         JavaSymbolSolver symbolResolver = new JavaSymbolSolver(pTypeSolver);
 //        debugParameter(pTypeSolver, symbolResolver);
         JavaParser.getStaticConfiguration().setSymbolResolver(symbolResolver);
-        JavaParser.getStaticConfiguration().setValidator(new Java6Validator());
+        JavaParser.getStaticConfiguration().setValidator(new Java7Validator());
         JavaParser.getStaticConfiguration().setDoNotAssignCommentsPrecedingEmptyLines(false);
         
         return CompilationUnitWrapper.createCompilationUnitWrapper(pFromFile, LexicalPreservingPrinter.setup(JavaParser.parse(pFromFile)));

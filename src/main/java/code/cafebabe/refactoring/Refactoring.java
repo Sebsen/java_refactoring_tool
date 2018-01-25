@@ -15,6 +15,7 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import code.cafebabe.refactoring.action.Action;
 import code.cafebabe.refactoring.action.FieldConverterAction;
+import code.cafebabe.refactoring.action.MethodCallMapperAction;
 
 public abstract class Refactoring {
 
@@ -48,6 +49,8 @@ public abstract class Refactoring {
 			}
 			if (action instanceof FieldConverterAction) {
 				return new MethodCallRefactoring(target, action, replacement);
+			} else if (action instanceof MethodCallMapperAction) {
+				return new MethodMappingRefactoring(target, action, replacement);
 			}
 			return new MethodDeclarationRefactoring(target, action, replacement);
 		}
