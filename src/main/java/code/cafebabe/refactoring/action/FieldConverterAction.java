@@ -16,7 +16,7 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 public final class FieldConverterAction extends Action {
 
 	private final Set<String> desiredFieldNames = new LinkedHashSet<>();
-	
+
 	public FieldConverterAction(final List<String> pDesiredFieldNames) {
 		desiredFieldNames.addAll(pDesiredFieldNames);
 	}
@@ -24,16 +24,16 @@ public final class FieldConverterAction extends Action {
 	@Override
 	public void consume(List<Node> pNodesToProcess, Set<FieldDeclaration> matchingFieldDeclarationsForTargetType,
 			Set<FieldDeclaration> matchingFieldDeclarationsForReplacementType) {
-		
+
 		if (!pNodesToProcess.isEmpty() && !matchingFieldDeclarationsForTargetType.isEmpty()) {
 			final FieldDeclaration matchingField = matchingFieldDeclarationsForTargetType.iterator().next();
-			
+
 			for (Node nodeToProcess : pNodesToProcess) {
 				MethodCallExpr convertedNode = (MethodCallExpr) nodeToProcess;
 				convertedNode.replace(JavaParser.parseExpression(matchingField.getVariable(0).getNameAsString()));
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -47,8 +47,16 @@ public final class FieldConverterAction extends Action {
 
 	@Override
 	public <T extends Node> boolean isApplyable(T pNode, String pTargetType, TypeSolver pTypeSolver) {
-		return pNode instanceof MethodCallExpr && isReturnTypeTargetType(
-				JavaParserFacade.get(pTypeSolver).solveMethodAsUsage((MethodCallExpr) pNode), pTargetType);
+		try {
+			return pNode instanceof MethodCallExpr && isReturnTypeTargetType(
+					JavaParserFacade.get(pTypeSolver).solveMethodAsUsage((MethodCallExpr) pNode), pTargetType);
+		} catch (RuntimeException e) {
+			System.out.println("Error causing node: " + pNode);
+			pNode.findCompilationUnit().ifPresent(System.out::println);
+			e.printStackTrace();
+			return false;
+//			throw e;
+		}
 	}
 
 	/**
