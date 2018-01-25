@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import code.cafebabe.refactoring.Change;
@@ -20,6 +21,7 @@ import code.cafebabe.refactoring.util.CompilationUnitWriter;
 public class SingleThreadedProcessor extends RefactoringProcessor {
 
 	private final boolean isDryRun;
+	private int initialCodeBaseSize;
 
 	public SingleThreadedProcessor(final boolean pIsDryRun) {
 		isDryRun = pIsDryRun;
@@ -27,6 +29,7 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 
 	@Override
 	protected Set<Change> processRefactorings(final CodeBase pCodeBase, final Refactoring pRefactoring) {
+		initialCodeBaseSize = pCodeBase.size();
 
 		// Create type solver from CodeBase
 		final TypeSolver mySolver = TypeSolverFactory.createFrom(pCodeBase);
@@ -47,7 +50,10 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 			}
 
 			// Apply change
-			changes.add(Change.createFrom(cu, pRefactoring.apply(cu.getCompilationUnit(), mySolver)));
+			CompilationUnit changedCompilationUnit = pRefactoring.apply(cu.getCompilationUnit(), mySolver);
+			if (changedCompilationUnit != null) {
+				changes.add(Change.createFrom(cu, changedCompilationUnit));
+			}
 		}
 
 		return changes;
@@ -71,7 +77,8 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 				}
 			}
 		} else {
-			System.out.println("Files that would change:");
+			System.out.println("Files that would change [" + pChangesToPersist.size() + " in total from originally "
+					+ initialCodeBaseSize + "]:");
 			for (Change change : pChangesToPersist) {
 				System.out.println("\t" + change.getOriginal().getSourceFile().getPath());
 			}
