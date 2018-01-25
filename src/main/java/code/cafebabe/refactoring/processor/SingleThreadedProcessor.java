@@ -70,6 +70,11 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 					e.printStackTrace();
 				}
 			}
+		} else {
+			System.out.println("Files that would change:");
+			for (Change change : pChangesToPersist) {
+				System.out.println("\t" + change.getOriginal().getSourceFile().getPath());
+			}
 		}
 	}
 
