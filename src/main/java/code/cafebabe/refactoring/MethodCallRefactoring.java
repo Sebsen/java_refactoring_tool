@@ -26,8 +26,9 @@ import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public class MethodCallRefactoring extends Refactoring {
 
-	private boolean trustImportStatements = false;
+	private boolean trustImportStatements = true;
 	private final Action action;
+	private int cnt = 0;
 
 	MethodCallRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
 		super(pTargetType, pReplacement);
@@ -36,8 +37,13 @@ public class MethodCallRefactoring extends Refactoring {
 
 	@Override
 	public CompilationUnit apply(final CompilationUnit pCompilationUnit, final TypeSolver pTypeSolver) {
+		cnt++;
+		if (cnt % 10 == 0) {
+			pCompilationUnit.findFirst(ClassOrInterfaceDeclaration.class)
+					.ifPresent(c -> System.out.println("Checking: " + c.getNameAsString()));
+		}
 		if (trustImportStatements && !doImportsContainTargetType(pCompilationUnit, targetType)) {
-			return pCompilationUnit;
+			return null;
 		}
 
 		final Set<FieldDeclaration> matchingFieldDeclarationsForTargetType = resolveFieldDeclarations(pCompilationUnit,
