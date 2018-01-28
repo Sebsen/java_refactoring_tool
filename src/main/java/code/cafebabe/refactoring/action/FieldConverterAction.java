@@ -2,19 +2,35 @@ package code.cafebabe.refactoring.action;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
+/**
+ * This class is intended to convert a given method call expression on a given
+ * target type and replace the method call expression by a field access
+ * expression.
+ * 
+ * @author Sebastian
+ *
+ */
 public final class FieldConverterAction extends Action {
 
+	private static final Logger logger = LoggerFactory.getLogger(FieldConverterAction.class);
+	
 	private final Set<String> desiredFieldNames = new LinkedHashSet<>();
 
 	public FieldConverterAction(final List<String> pDesiredFieldNames) {
@@ -38,11 +54,12 @@ public final class FieldConverterAction extends Action {
 
 	@Override
 	public void consumeFieldDeclarations(Set<FieldDeclaration> pFieldDeclarations) {
-		System.out.println(pFieldDeclarations);
+		// Anything to do with field declarations
 	}
 
 	@Override
 	public void consumeImports(final List<ImportDeclaration> pImports, String pTargetType) {
+		// Anything to do with imports
 	}
 
 	@Override
@@ -51,11 +68,14 @@ public final class FieldConverterAction extends Action {
 			return pNode instanceof MethodCallExpr && isReturnTypeTargetType(
 					JavaParserFacade.get(pTypeSolver).solveMethodAsUsage((MethodCallExpr) pNode), pTargetType);
 		} catch (RuntimeException e) {
-			System.out.println("Error causing node: " + pNode);
-			pNode.findCompilationUnit().ifPresent(System.out::println);
-			e.printStackTrace();
+			String typeName = "null";
+			if (pNode.findCompilationUnit().isPresent()
+					&& pNode.findCompilationUnit().get().findFirst(ClassOrInterfaceDeclaration.class).isPresent()) {
+				typeName = pNode.findCompilationUnit().get()
+						.findFirst(ClassOrInterfaceDeclaration.class).get().getNameAsString();
+			}
+			logger.error("Error while parsing type " + typeName + " causing node: " + pNode, e);
 			return false;
-//			throw e;
 		}
 	}
 

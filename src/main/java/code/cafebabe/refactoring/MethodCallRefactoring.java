@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
@@ -25,10 +28,11 @@ import code.cafebabe.refactoring.action.Action;
 import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public class MethodCallRefactoring extends Refactoring {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MethodCallRefactoring.class);
 
 	private boolean trustImportStatements = true;
 	private final Action action;
-	private int cnt = 0;
 
 	MethodCallRefactoring(final String pTargetType, final Action pAction, final String pReplacement) {
 		super(pTargetType, pReplacement);
@@ -37,11 +41,9 @@ public class MethodCallRefactoring extends Refactoring {
 
 	@Override
 	public CompilationUnit apply(final CompilationUnit pCompilationUnit, final TypeSolver pTypeSolver) {
-		cnt++;
-		if (cnt % 10 == 0) {
-			pCompilationUnit.findFirst(ClassOrInterfaceDeclaration.class)
-					.ifPresent(c -> System.out.println("Checking: " + c.getNameAsString()));
-		}
+		pCompilationUnit.findFirst(ClassOrInterfaceDeclaration.class)
+				.ifPresent(c -> logger.info("Checking: " + c.getNameAsString()));
+
 		if (trustImportStatements && !doImportsContainTargetType(pCompilationUnit, targetType)) {
 			return null;
 		}

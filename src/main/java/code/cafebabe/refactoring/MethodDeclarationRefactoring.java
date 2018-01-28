@@ -1,27 +1,26 @@
 package code.cafebabe.refactoring;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.symbolsolver.javaparser.Navigator;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.google.common.collect.Lists;
 
 import code.cafebabe.refactoring.action.Action;
 
 public class MethodDeclarationRefactoring extends Refactoring {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MethodDeclarationRefactoring.class);
 
 	private boolean trustImportStatements = true;
 	private final Action action;
@@ -59,7 +58,7 @@ public class MethodDeclarationRefactoring extends Refactoring {
 	}
 
 	private void debugMatchingFields(final Set<FieldDeclaration> matchingFieldDeclarations) {
-		System.out.println("Matching FieldDeclarations: " + matchingFieldDeclarations);
+		logger.info("Matching FieldDeclarations: " + matchingFieldDeclarations);
 	}
 
 }

@@ -22,12 +22,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import code.cafebabe.refactoring.util.FileUtil;
 
 public class CodeBase implements BlockingQueue<File> {
 
 	private final BlockingQueue<File> matchingFiles;
 	private final Set<CodeBaseRootFile> codeBaseRoots;
+	
+	private static final Logger logger = LoggerFactory.getLogger(CodeBase.class);
 
 	/**
 	 * Pattern which files have to satisfy for being added as jar file roots to
@@ -62,6 +67,7 @@ public class CodeBase implements BlockingQueue<File> {
 				.filter(CodeBaseRootFile::isSourceFile).flatMap(f -> FileUtil.getMatchingFiles(f.getReferencedFile(),
 						SOURCE_FILE_PATTERN, DIRECTORY_TO_INCLUDE_PATTERN, pRecursive).stream())
 				.forEach(matchingFiles::add);
+		logger.info("[CodeBase] Size: " + matchingFiles.size());
 	}
 
 	@Override
