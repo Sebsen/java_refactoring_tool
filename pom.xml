@@ -93,11 +93,11 @@
 				<version>${junit.vintage.version}</version>
 				<scope>test</scope>
 			</dependency>
-			<!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+			<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
 			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.1.1</version>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.2.3</version>
 			</dependency>
 			<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
 			<dependency>
@@ -114,16 +114,10 @@
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>java-symbol-solver-core</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<!-- JUnit 5 -->
 		<dependency>

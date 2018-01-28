@@ -7,6 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
@@ -19,6 +22,8 @@ import code.cafebabe.refactoring.factory.TypeSolverFactory;
 import code.cafebabe.refactoring.util.CompilationUnitWriter;
 
 public class SingleThreadedProcessor extends RefactoringProcessor {
+
+	private static final Logger logger = LoggerFactory.getLogger(SingleThreadedProcessor.class);
 
 	private final boolean isDryRun;
 	private int initialCodeBaseSize;
@@ -46,7 +51,7 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 			} catch (FileNotFoundException e) {
 				// Should never occur since we're processing a codebase and it
 				// verifies it's contained files exist
-				e.printStackTrace();
+				logger.error("Could not create CompilationUnit of file: " + next, e);
 			}
 
 			// Apply change
@@ -71,16 +76,17 @@ public class SingleThreadedProcessor extends RefactoringProcessor {
 			// files
 			for (Change change : pChangesToPersist) {
 				try {
+					logger.info("Writing changes to file: " + change.getOriginal().getSourceFile());
 					CompilationUnitWriter.writeToFile(change.getTransformed(), change.getOriginal().getSourceFile());
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("Error writing changes to file: " + change.getOriginal().getSourceFile() + "!");
 				}
 			}
 		} else {
-			System.out.println("Files that would change [" + pChangesToPersist.size() + " in total from originally "
+			logger.info("Files that would change [" + pChangesToPersist.size() + " in total from originally "
 					+ initialCodeBaseSize + "]:");
-			for (Change change : pChangesToPersist) {
-				System.out.println("\t" + change.getOriginal().getSourceFile().getPath());
+			for (final Change change : pChangesToPersist) {
+				logger.info("\t" + change.getOriginal().getSourceFile().getPath());
 			}
 		}
 	}

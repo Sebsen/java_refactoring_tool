@@ -3,7 +3,8 @@ package code.cafebabe.refactoring.processor;
 import java.util.Collections;
 import java.util.Set;
 
-import com.github.javaparser.ast.CompilationUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import code.cafebabe.refactoring.Change;
 import code.cafebabe.refactoring.CodeBase;
@@ -11,6 +12,8 @@ import code.cafebabe.refactoring.Refactoring;
 
 public abstract class RefactoringProcessor {
 
+	private static final Logger logger = LoggerFactory.getLogger(RefactoringProcessor.class);
+	
 	/**
 	 * This method handles the main program flow of the refactoring of an code
 	 * base. First it applies the provided refactorings on the given code base
@@ -31,6 +34,8 @@ public abstract class RefactoringProcessor {
 	 *         persisted
 	 */
 	public final Set<Change> process(final CodeBase pCodeBase, final Refactoring pRefactoring) {
+		logger.info("Starting Refactoring Tool...");
+		logger.info("\t\tHappy Refactoring!");
 		final Set<Change> changes = processRefactorings(pCodeBase, pRefactoring);
 		final Set<Change> filteredChanges = Collections.unmodifiableSet(reviewRefactorings(changes));
 		persistChanges(filteredChanges);
