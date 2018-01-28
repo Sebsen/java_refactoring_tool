@@ -28,7 +28,7 @@ import code.cafebabe.refactoring.action.Action;
 import code.cafebabe.refactoring.action.FieldConverterAction;
 
 public class MethodCallRefactoring extends Refactoring {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(MethodCallRefactoring.class);
 
 	private boolean trustImportStatements = true;
@@ -65,13 +65,35 @@ public class MethodCallRefactoring extends Refactoring {
 						.collect(Collectors.toList());
 
 				if (matchingFieldDeclarationsForTargetType.isEmpty() && !nodesToProcess.isEmpty()) {
+
+					// TODO: Create issue! Import is not added properly -
+					// x.addImport(Clazz) works fine though..!
+
+					// Check if we already have an import for same type we
+					// introduce a field for (but different package), so that we
+					// cannot simply add an import for target type
+					boolean containsImportOfSimilarEndingType = false;
+					for (ImportDeclaration importDec : pCompilationUnit.getImports()) {
+						if (importDec.getNameAsString().endsWith(targetType.substring(targetType.lastIndexOf('.')))) {
+							containsImportOfSimilarEndingType = true;
+							break;
+						}
+					}
+
 					// Since we want to convert method calls to field access
 					// (but
 					// any field of desired type is present in processed type)
 					// manually add one!
 					final FieldDeclaration fieldDeclartionToAdd = new FieldDeclaration(
-							EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
-							createVariableDeclaration(pCompilationUnit, nodesToProcess));
+							EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL), createVariableDeclaration(
+									pCompilationUnit, nodesToProcess, containsImportOfSimilarEndingType));
+
+					// Check if we have already an import for type (and we have
+					// to use fully qualified name) or we can simply import
+					// target type
+					if (!containsImportOfSimilarEndingType) {
+						pCompilationUnit.addImport(targetType, false, false);
+					}
 
 					// Add field to list of 'retrieved' fields of desired type
 					// from
@@ -80,13 +102,6 @@ public class MethodCallRefactoring extends Refactoring {
 
 					// And then also add it to compilation unit itself
 					addFieldToCompilationUnit(pCompilationUnit, fieldDeclartionToAdd);
-
-					// TODO: Create issue! Import is not added properly -
-					// x.addImport(Clazz) works fine though..!
-					if (pCompilationUnit.getImports().stream().map(ImportDeclaration::getNameAsString)
-							.filter(importDec -> importDec.equals(targetType)).count() <= 0) {
-						pCompilationUnit.addImport(targetType, false, false);
-					}
 
 					// TODO: Create issue sorting imports: Imports get
 					// duplicated..
@@ -147,7 +162,7 @@ public class MethodCallRefactoring extends Refactoring {
 	}
 
 	private VariableDeclarator createVariableDeclaration(final CompilationUnit pCompilationUnit,
-			final List<Node> nodesToProcess) {
+			final List<Node> nodesToProcess, final boolean pUseFullyQualifiedName) {
 
 		final Optional<ClassOrInterfaceDeclaration> classDeclaration = pCompilationUnit
 				.findFirst(ClassOrInterfaceDeclaration.class);
@@ -169,13 +184,14 @@ public class MethodCallRefactoring extends Refactoring {
 
 		// Create variable/ field initializer expression out of target
 		// MethodCallExpr which shall be replaced
-		return new VariableDeclarator(convertTargetTypeToType(), newFieldName,
+		return new VariableDeclarator(convertTargetTypeToType(pUseFullyQualifiedName), newFieldName,
 				(MethodCallExpr) nodesToProcess.get(0).clone());
 	}
 
-	private ClassOrInterfaceType convertTargetTypeToType() {
-		return JavaParser
-				.parseClassOrInterfaceType(targetType.substring(targetType.lastIndexOf('.') + 1, targetType.length()));
+	private ClassOrInterfaceType convertTargetTypeToType(final boolean pUseFullyQualifiedName) {
+		final String typeName = pUseFullyQualifiedName ? targetType
+				: targetType.substring(targetType.lastIndexOf('.') + 1);
+		return JavaParser.parseClassOrInterfaceType(typeName);
 	}
 
 }
